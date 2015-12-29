@@ -1,0 +1,89 @@
+@charset "utf-8";
+@import "../_vars.scss";
+@import "../_mixins.scss";
+
+/***** Icons */
+
+span.icon,
+a.icon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.icon {
+    background: url('../img/sprite.png') no-repeat top left;
+    width: 32px;
+    height: 32px;
+    opacity: 0.6;
+    @include transition(0.2s all linear);
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        background: url('../img/sprite-retina.png') no-repeat top left;
+        background-size: 32px 340px;
+    }
+    &.icon-centered {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-top: -16px;
+        margin-left: -16px;
+    }
+    &.arrow-dark {
+        background-position: 0 0;
+        width: 17px;
+        height: 12px;
+        opacity: 1;
+    }
+    &.arrow {
+        background-position: 0 -13px;
+        width: 17px;
+        height: 12px;
+        opacity: 1;
+    }
+    &.error-close {
+        background-position: 0 -26px;
+        width: 16px;
+        height: 16px;
+    }
+    &.copy {
+        background-position: 0 -43px;
+    }
+    &.image {
+        background-position: 0 -76px;
+    }
+    &.settings {
+        background-position: 0 -109px;
+        margin-left: 5px;
+        &.active {
+            opacity: 0.25;
+            -ms-transform: rotate(60deg);
+            -webkit-transform: rotate(60deg);
+            transform: rotate(60deg);
+        }
+    }
+    &.trash {
+        background-position: 0 -142px;
+    }
+    &.disk {
+        background-position: 0 -175px;
+    }
+    &.controls {
+        background-position: 0 -208px;
+    }
+    &.star {
+        background-position: 0 -241px;
+    }
+    &.back {
+        background-position: 0 -274px;
+    }
+    &.forward {
+        background-position: 0 -307px;
+    }
+    &.refresh {
+        background-position: 0 -340px;
+    }
+    &.github {
+        display: block;
+        margin: 10px auto 0 auto;
+        background-position: 0 -208px;
+    }
+}

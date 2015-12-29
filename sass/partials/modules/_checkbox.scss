@@ -1,0 +1,67 @@
+@charset "utf-8";
+@import "../_vars.scss";
+@import "../_mixins.scss";
+
+/***** Checkbox */
+
+.checkbox {
+    position: relative;
+    display: inline-block;
+    background: $control-color;
+    border: 1px solid #202020;
+    border-radius: 2px;
+    min-width: $min-control-box-width;
+    height: 39px;
+    margin: 5px 10px 10px 0;
+    padding: 0;
+    text-indent: 0;
+    text-align: left;
+    transition: 0.25s ease background-color;
+    overflow: hidden;
+    input {
+        display: none;
+    }
+    label {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        line-height: 39px;
+        padding-left: 50px;
+        cursor: pointer;
+        color: $text-color-dark;
+        transition: 0.25s ease color;
+        
+        &:before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 39px;
+            height: 39px;
+            border-right: 2px solid $darkest-color;
+            content: '';
+            box-sizing: border-box;
+        }
+        &:after {
+            position: absolute;
+            top: 7px;
+            left: 7px;
+            display: block;
+            width: 24px;
+            height: 24px;
+            background: $darkest-color;
+            content: '';
+            box-sizing: border-box;
+            transition: 0.25s ease background-color;
+        }
+    }
+    input:checked + label {
+        color: $text-color;
+        &:after {
+            background: $active-color;
+            border: 1px solid $darkest-color;
+        }
+    }
+}

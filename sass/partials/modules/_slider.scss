@@ -1,0 +1,111 @@
+@charset "utf-8";
+@import "../_vars.scss";
+@import "../_mixins.scss";
+
+/***** Slider */
+
+.slider-box {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #202020;
+    border-radius: 2px;
+    min-width: $min-control-box-width;
+    height: 39px;
+    margin: 5px 10px 10px 0;
+    padding: 0;
+    text-indent: 0;
+    text-align: left;
+    transition: 0.25s ease background-color;
+    overflow: hidden;
+    background: $control-color;
+    &.active {
+        background: #b7b7b7;
+        .slider-box-edit-button {
+            cursor: default;
+            border-left: 5px solid $active-color;
+            z-index: -1;
+        }
+        .slider-box-track-container {
+            z-index: 1;
+            opacity: 1;
+        }
+        .value, .unit-of-measure {
+            color: #000;
+            text-shadow: none;
+            &:after {
+                content: '';
+            }
+        }
+        .title {
+            opacity: 0;
+        }
+    }
+    .slider-box-edit-button {
+        cursor: pointer;
+        width: 100%;
+        height: 39px;
+        color: $text-color-dark;
+        padding: 0 0 0 7px;
+        line-height: 37px;
+        color: #ded3cc;
+        opacity: 1;
+        z-index: 1;
+        border-left: 5px solid transparent;
+    }
+    .value {
+        line-height: 37px;
+        font-size: 15px;
+        color: $text-color;
+        &:after {
+            color: $text-color-darkest;
+            content: ' - '
+        }
+    }
+    .unit-of-measure {
+        line-height: 37px;
+        color: $text-color-dark;
+        font-size: 11px;
+    }
+    .title {
+        color: $text-color-dark;
+        line-height: 37px;
+    }
+    
+    .slider-box-track-container {
+        cursor: default;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 55px;
+        right: 8px;
+        z-index: -1;
+        opacity: 0;
+    }
+    
+    .slider-box-track {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 6px;
+        background: $dark-color;
+        margin-top: -3px;
+        z-index: 0;
+        overflow: visible;
+        cursor: pointer;
+    }
+    
+    .slider-box-handle {
+        position:absolute;
+        left: 0;
+        top: 50%;
+        width: 10px;
+        height: 20px;
+        margin-top: -10px;
+        z-index: 1;
+        background: $drag-handle-color;
+        cursor: ew-resize;
+        border: 1px solid $drag-handle-border-color;
+    }
+
+}

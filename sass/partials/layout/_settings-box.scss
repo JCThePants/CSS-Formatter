@@ -1,0 +1,40 @@
+@charset "utf-8";
+@import "../_vars.scss";
+@import "../_mixins.scss";
+
+/***** Setings Box */
+.settings-box {
+    overflow: hidden;
+    opacity: 0;
+    height: 0;
+    padding: 0;
+                
+    &.open {
+        overflow: visible;
+        opacity: 1;
+        padding-top: 10px;
+        padding-bottom: 20px;
+        height: auto;
+    }
+    
+    ul {
+        display: table;
+    }
+     
+    li {
+        display: table-row;
+    }
+    
+    .settings-input, .settings-descr {
+        display: table-cell;
+        vertical-align: middle;
+    }
+    
+    .settings-descr {
+        padding-left: 5px;
+    }
+    
+    @media (min-width: $screen-sm) {
+        padding-top: 0;
+    }
+}

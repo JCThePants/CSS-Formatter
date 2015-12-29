@@ -1,0 +1,41 @@
+@charset "utf-8";
+@import "../_vars.scss";
+@import "../_mixins.scss";
+
+/***** Dropdown */
+.dropdown-button {
+    position: relative;
+    cursor: pointer;
+    padding-left: 20px;
+    
+    &:before {
+        position: absolute;
+        box-sizing: border-box;
+        content: '';
+        @include sprite;
+        @include arrow-dark;
+        left: -3px;
+        top: 9px;
+        transform: rotate(-90deg);
+        //transform-origin: 0 6px;
+        transition: 0.25s ease all;
+    }
+    
+    &.active {
+        &:before {
+            @include arrow;
+            transform: rotate(0deg);
+        }
+    }
+}
+
+[data-transition-height] {
+    margin-bottom: 20px;
+    opacity: 0;
+    @include transition(0.25s ease all);
+
+    &.open {
+        opacity: 1;
+        height: auto;
+    }
+}

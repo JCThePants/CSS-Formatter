@@ -1,0 +1,19 @@
+{
+    "spaceUnits": 4,
+    "path": {
+        "sass/styles.scss": {
+            "spaceUnits": 4,
+            "sass.enabled": true,
+            "sass.options": {
+                "outputDir": "../css/",
+                "imagePath": null,
+                "includePaths": [],
+                "sourceComments": false,
+                "outputStyle": "expanded"
+            },
+            "me.drewh.jsbeautify.on_save": true,
+            "linting.collapsed": false,
+            "brackets-git.gitPath": "git"
+        }
+    }
+}

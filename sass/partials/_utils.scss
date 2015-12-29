@@ -1,0 +1,23 @@
+@charset "utf-8";
+@import "_vars.scss";
+
+/********* Utility Classes */
+.clear-fix {
+    clear: both;
+}
+
+.collapse {
+    visibility: collapse;
+}
+
+.hidden {
+    display: none !important;
+}
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
+.disabled {
+    opacity: 0.5 !important;
+}

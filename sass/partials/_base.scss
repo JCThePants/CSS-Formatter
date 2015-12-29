@@ -1,0 +1,78 @@
+@charset "utf-8";
+@import "_vars.scss";
+
+/********* Base Styles */
+
+html {
+    height: 100%;
+    min-height: 100%;
+}
+
+body {
+    height: 100%;
+    min-height: 100%;
+    position: relative;
+    background: $darkest-color;
+    @include user-select(none);
+    padding: 5px 0 10px 0;
+    font-size: $base-font-size;
+    line-height: $base-font-size;
+    color: $text-color;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.75);
+
+    @media (min-width: $screen-sm) {
+        padding: 20px 0 30px 0;
+    }
+}
+
+a {
+    color: $link-color;
+}
+
+a:focus {
+    outline: none;
+}
+
+h1, h2, h3 {
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    padding-top: 5px;
+}
+
+h1 {
+    color: #e0cbb0;
+    font-size: 24px;
+    .title-note {
+        font-size: 22px;
+    }
+}
+
+h2 {
+    color: #e0cbb0;
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    .title-note {
+        font-size: 18px;
+    } 
+}
+
+h3 {
+    font-size: 16px;
+    padding-top: 10px;
+    .title-note {
+        font-size: 14px;
+    }
+}
+
+input {
+    @include user-select(all);
+}
+
+p {
+    line-height: 17px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    &+p {
+        margin-top: 0;
+    }
+}

@@ -58,6 +58,9 @@
 
             <!-- Text Area -->
             <div class="textarea">
+                <div class="parse-error-box" data-ng-class="{active:s.msg.parseError}">
+                    {{s.msg.parseError}}
+                </div>
                 <textarea data-ng-model="input"></textarea>
             </div>
 

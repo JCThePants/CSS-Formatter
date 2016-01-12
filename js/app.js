@@ -7,12 +7,11 @@ define(['rawUI', 'css-format'], function () {
      */
     app.controller('CSSFormatterCtrl', ['$scope', '$timeout', 'CSSParser', 'CSSFormatter', 'CSSTableOfContents', function ($scope, $timeout, CSSParser, CSSFormatter, CSSTableOfContents) {
 
-        
-
         // state variables
         var state = $scope.s = {
             msg: {
-                copy: null
+                copy: null,
+                parseError: null
             }
         };
         
@@ -129,8 +128,15 @@ define(['rawUI', 'css-format'], function () {
         $scope.$watch('input', function (val) {
             if (!val)
                 return;
-            $scope.parser = new CSSParser(val);
-            updateOutput();
+            try {
+                $scope.parser = new CSSParser(val);
+                updateOutput();
+                $scope.s.msg.parseError = null;
+            }
+            catch (e) {
+                $scope.s.msg.parseError = e;
+                console.log(e);
+            }
         });
         
         $scope.$watch('format', function (val) {

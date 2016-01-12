@@ -118,7 +118,6 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
          */
         CSSFormatter.prototype.generateLines = function () {
             var parser = this._parser,
-                options = this._options,
                 entities = parser.getSelectors(),
                 state = new CSSFormatState();
 
@@ -148,14 +147,14 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
          * @param   {CSSFormatState}  state    The formatter state.
          */
         CSSFormatter.prototype.generateComment = function (comment, indent, state) {
-            var options = this._options;
+            var copts = this._options.comments;
 
-            if (!options.comments.render)
+            if (!copts.render)
                 return;
 
             if (state.hasLines()) {
                 state.newLine(indent);
-                this.addEmptyLines(options.comments.linesBefore, indent, state);
+                this.addEmptyLines(copts.linesBefore, indent, state);
             }
 
             var commentLines = comment.toString().split('\n');
@@ -165,7 +164,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
                     state.newLine(indent);
             }
 
-            this.addEmptyLines(options.comments.linesAfter, indent, state);
+            this.addEmptyLines(copts.linesAfter, indent, state);
         };
 
         /**
@@ -193,9 +192,11 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
                 if (child instanceof CSSComment) {
                     this.generateComment(child, indent + options.indent, state);
-                } else if (child instanceof CSSParentSelector) {
+                } 
+                else if (child instanceof CSSParentSelector) {
                     this.generateParentSelectors(child, prev && prev instanceof CSSComment, indent + options.indent, state);
-                } else if (child instanceof CSSSelectors) {
+                } 
+                else if (child instanceof CSSSelectors) {
                     this.generateSelectors(child, prev && prev instanceof CSSComment, indent + options.indent, state);
                     this.generateProperties(child, indent + options.indent, state);
                 }
@@ -216,7 +217,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
          */
         CSSFormatter.prototype.generateSelectors = function (selectors, isAfterComment, indent, state) {
             var options = this._options,
-                selOptions = options.selectors;
+                sopts = options.selectors;
 
             options.selectors.newLine && state.hasLines() && state.newLine(indent);
 
@@ -226,7 +227,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
             function comma(index, output) {
                 var isLast = index === selectors.selectors.length - 1;
                 if (!isLast) {
-                    output.push(',' + CSSUtils.spaces(selOptions.multispace));
+                    output.push(',' + CSSUtils.spaces(sopts.multispace));
                 }
             }
 
@@ -236,13 +237,13 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
                 comma(i, text);
 
                 var newLine = (function () {
-                    if (!selOptions.maxLength)
+                    if (!sopts.maxLength)
                         return false;
 
-                    if (options.selectors.forcePerLine)
+                    if (sopts.forcePerLine)
                         return i !== last;
 
-                    if (selOptions.combinatedPerLine && sel.hasCombinator()) {
+                    if (sopts.combinatedPerLine && sel.hasCombinator()) {
                         
                         if (state.current.text().length !== 0 && i !== 0) {
                             // put on own line if not on new line from previous selector
@@ -253,7 +254,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
                     }
 
                     var newLen = state.current.length() + text.toString().length;
-                    return i !== last && newLen > selOptions.maxLength;
+                    return i !== last && newLen > sopts.maxLength;
                 }());
 
                 state.current.push(text);
@@ -278,41 +279,43 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
          */
         CSSFormatter.prototype.generateProperties = function (selectors, indent, state) {
             var options = this._options,
+                popts = options.property,
+                copts = options.comments,
                 properties = selectors.properties;
 
             for (var i = 0, last = properties.length - 1, prop; prop = properties[i]; i++) {
 
                 // add comment line
                 if (prop instanceof CSSComment) {
-                    if (options.comments.renderProperty) {
+                    if (copts.renderProperty) {
 
-                        options.property.newLine && state.newLine(indent);
+                        popts.newLine && state.newLine(indent);
 
                         state.current.push([CSSUtils.spaceChar, prop]);
                     }
                     continue;
                 } else if (prop instanceof CSSProperty) {
 
-                    options.property.newLine && state.newLine(indent + options.indent);
+                    popts.newLine && state.newLine(indent + options.indent);
 
                     state.current.push([prop.name(), ':']);
 
-                    options.property.spaceBetween && state.current.push(CSSUtils.spaces(options.property.spaceBetween));
+                    popts.spaceBetween && state.current.push(CSSUtils.spaces(popts.spaceBetween));
 
                     state.current.push(prop.value());
 
-                    if (last !== i || (options.property.closeLast && last === i))
+                    if (last !== i || (popts.closeLast && last === i))
                         state.current.push(';');
 
                     // add inline comment
                     if (prop.comment) {
-                        if (options.comments.inlineSpace)
-                            state.current.push(CSSUtils.spaces(options.comments.inlineSpace));
+                        if (copts.inlineSpace)
+                            state.current.push(CSSUtils.spaces(copts.inlineSpace));
 
                         state.current.push(prop.comment);
                     }
 
-                    options.property.indentAfter && state.current.push(CSSUtils.spaces(options.property.indentAfter));
+                    popts.indentAfter && state.current.push(CSSUtils.spaces(popts.indentAfter));
                 }
             }
 
@@ -326,12 +329,13 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
          * @param {number}           indent  The current indent.
          */
         CSSFormatter.prototype.generateOpeningBrace = function (state, indent) {
-            var options = this._options;
+            var current = state.current,
+                braces = this._options.braces;
 
-            options.braces.openNewLine && state.newLine(indent);
-            options.braces.openIndent && state.current.push(CSSUtils.spaces(options.braces.openIndent));
-            state.current.push('{');
-            options.braces.openIndentAfter && state.current.push(CSSUtils.spaces(options.braces.openIndentAfter));
+            braces.openNewLine && state.newLine(indent);
+            braces.openIndent && current.push(CSSUtils.spaces(braces.openIndent));
+            current.push('{');
+            braces.openIndentAfter && current.push(CSSUtils.spaces(braces.openIndentAfter));
         };
 
         /**
@@ -341,12 +345,13 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
          * @param {number}           indent  The current indent.
          */
         CSSFormatter.prototype.generateClosingBrace = function (state, indent) {
-            var options = this._options;
+            var current = state.current,
+                braces = this._options.braces;
 
-            options.braces.closeNewLine && state.newLine(indent);
-            options.braces.closeIndent && state.current.push(CSSUtils.spaces(options.braces.closeIndent));
+            braces.closeNewLine && state.newLine(indent);
+            braces.closeIndent && current.push(CSSUtils.spaces(braces.closeIndent));
             state.current.push('}');
-            options.braces.closeIndentAfter && state.current.push(CSSUtils.spaces(options.braces.closeIndentAfter));
+            braces.closeIndentAfter && current.push(CSSUtils.spaces(braces.closeIndentAfter));
         };
 
         /**
@@ -358,19 +363,19 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
          * @param   {boolean}         isAfterComment  True if the selectors are after a comment.
          */
         CSSFormatter.prototype.generateLinesBeforeSelector = function (state, indent, selectors, isAfterComment) {
-            var selOptions = this._options.selectors;
+            var sopts = this._options.selectors;
 
             var linesBefore = (function () {
 
                 if (!state.hasLines())
                     return 0;
 
-                var result = selOptions.linesBefore;
+                var result = sopts.linesBefore;
 
                 if (isAfterComment) {
-                    result = selOptions.linesBeforeComment;
-                } else if (selOptions.linesBeforeMulti && (!selectors || selectors.selectors.length > 1)) {
-                    result = Math.max(result, selOptions.linesBeforeMulti);
+                    result = sopts.linesBeforeComment;
+                } else if (sopts.linesBeforeMulti && (!selectors || selectors.selectors.length > 1)) {
+                    result = Math.max(result, sopts.linesBeforeMulti);
                 }
 
                 return result;
@@ -582,12 +587,16 @@ module.factory('CSSParser', ['CSSComment', 'CSSParentSelector', 'CSSProperty', '
     function CSSParserState(css) {
         this.css = css;
         this.i = 0;
+        // selectors that can have child selectors (embedded)
+        this.parentSelectors = [
+            '@media'
+        ];
     }
 
     /**
      * Parses stylesheet string into an object model.
      * 
-     * @param {string} css   The stylesheet to parse.
+     * @param {string|CSSParserState} css   The stylesheet to parse.
      */
     function CSSParser(css) {
 
@@ -641,34 +650,34 @@ module.factory('CSSParser', ['CSSComment', 'CSSParentSelector', 'CSSProperty', '
                 }
 
             }
-            // check for parent selector
-            else if (ch === '@') {
-
-                var result = this.parseTill('{', state);
-                state.i++;
-
-                var parent = new CSSParentSelector(result.trim());
-                var parser = new CSSParser(state);
-                for (var j = 0, item; item = parser.getSelectors()[j]; j++) {
-                    parent.children.push(item);
-                }
-                selectors.push(parent);
-
-            }
             // parse selectors
             else if (mode === 'none') {
 
-                if (ch === '}')
-                    break;
+                // check for embeddable selectors
+                if (this.matchAhead(state.parentSelectors, state)) {
+                    var result = this.parseTill('{', state);
+                    state.i++;
 
-                currSelectors = this.parseSelectors(state);
-                if (!currSelectors) {
-                    pushSelectors();
-                    continue;
+                    var parent = new CSSParentSelector(result.trim());
+                    var parser = new CSSParser(state);
+                    for (var j = 0, item; item = parser.getSelectors()[j]; j++) {
+                        parent.children.push(item);
+                    }
+                    selectors.push(parent);
                 }
+                else {
 
-                mode = 'parse-property';
+                    if (ch === '}')
+                        break;
 
+                    currSelectors = this.parseSelectors(state);
+                    if (!currSelectors) {
+                        pushSelectors();
+                        continue;
+                    }
+
+                    mode = 'parse-property';
+                }
             }
             // parse property name
             else if (mode === 'parse-property') {
@@ -736,7 +745,7 @@ module.factory('CSSParser', ['CSSComment', 'CSSParentSelector', 'CSSProperty', '
      * Continue parsing until a specific character is found.
      * 
      * @param   {string}    term   The character to stop at.
-     * @param   {CSSState}  state  The parser state.
+     * @param   {CSSParserState}  state  The parser state.
      *                             
      * @returns {string}  The characters that were parsed.
      */
@@ -749,6 +758,37 @@ module.factory('CSSParser', ['CSSComment', 'CSSParentSelector', 'CSSProperty', '
             result += ch;
         }
         return result;
+    };
+
+
+    /**
+     * check if the next characters in the CSS match any strings in a terms array.
+     *
+     * @param {Array}     terms  An array of strings to match against.
+     * @param {CSSParserState}  state  The parser state.
+     *
+     * @returns {string|null}  The matching string or null if no matches.
+     */
+    CSSParser.prototype.matchAhead = function(terms, state) {
+        for (var i= 0, isMatch = true, match; match = state.parentSelectors[i]; i++) {
+
+            for (var j= state.i, ch; ch = state.css[j]; j++) {
+
+                var letterIndex = j - state.i;
+                if (letterIndex === match.length)
+                    break;
+
+                if (ch !== match[letterIndex]) {
+                    isMatch = false;
+                    break;
+                }
+            }
+
+            if (isMatch) {
+                return match;
+            }
+        }
+        return null;
     };
 
     /**

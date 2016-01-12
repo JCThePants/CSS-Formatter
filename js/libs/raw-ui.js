@@ -1,8 +1,26 @@
+/*
+ * Licensed under the MIT License (MIT).
+ * (http://opensource.org/licenses/MIT)
+ * Copyright (c) JCThePants (github.com/JCThePants/rawUI)
+ */
+
+/* Included modules: general, required, controls, Date Time, Calendar Control, Modals, Popups, Select Control, 
+   Slider Control, Tabular Data, Tabular Pagination, Tabular Sorting, Validation */
+
 (function(window, document){
-'use strict';
 var module = angular.module('rawUI', []),
     ae = angular.element,
-    defineProperty = Object.defineProperty;
+    defineProperty = Object.defineProperty,
+    ruiDirectiveName = function (name) {
+        return name;
+    },
+    ruiServiceName = function (name) {
+        // add rui prefix
+        return 'rui' + name[0].toUpperCase() + name.substr(1);
+    },
+    ruiFactoryName = function (name) {
+        return 'Rui' + name;
+    };
 
 
 
@@ -41,9 +59,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('transitionHeight', TransitionHeightDirective);
+    var directiveName = ruiDirectiveName('transitionHeight');
 
-    TransitionHeightDirective.$inject = ['$parse', 'rawUI.utils'];
+    module.directive(directiveName, TransitionHeightDirective);
+
+    TransitionHeightDirective.$inject = ['$parse', ruiServiceName('utils')];
 
     /* directive */
     function TransitionHeightDirective($parse, utils) {
@@ -57,15 +77,17 @@ module.directive('a', function () {
 
         /* link */
         function transitionHeightLink($scope, $elem, $attrs) {
-            var getter = $attrs.transitionHeight ? $parse($attrs.transitionHeight) : null,
+
+            var attrVal = $attrs[directiveName];
+            if (!attrVal) {
+                console.warn('transitionHeight directive requires an expression to evaluate.');
+                return;
+            }
+
+            var getter = $parse(attrVal),
                 isOpen = false,
                 rect = utils.rect,
                 inProgress;
-
-            if (!getter) {
-                console.warn('transitionHeight directive requires a parseable boolean attribute value.');
-                return;
-            }
 
             // set height to auto if window is resized while open
             // to ensure element is properly resized.
@@ -162,9 +184,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('enable', EnableDirective);
+    var directiveName = ruiDirectiveName('enable');
 
-    EnableDirective.$inject = ['$parse', 'rawUI.utils'];
+    module.directive(directiveName, EnableDirective);
+
+    EnableDirective.$inject = ['$parse', ruiServiceName('utils')];
 
     /* directive */
     function EnableDirective($parse, utils) {
@@ -178,12 +202,14 @@ module.directive('a', function () {
 
         /* link */
         function enableLink($scope, $elem, $attrs) {
-            if (!$attrs.enable) {
+
+            var attrVal = $attrs[directiveName];
+            if (!attrVal) {
                 console.warn('enable directive requires an expression to evaluate.');
                 return;
             }
 
-            var getter = $parse($attrs.enable);
+            var getter = $parse(attrVal);
 
             $scope.$watch(function () {
                 return getter($scope);
@@ -221,9 +247,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('disable', DisableDirective);
+    var directiveName = ruiDirectiveName('disable');
 
-    DisableDirective.$inject = ['$parse', 'rawUI.utils'];
+    module.directive(directiveName, DisableDirective);
+
+    DisableDirective.$inject = ['$parse', ruiServiceName('utils')];
 
     /* disable */
     function DisableDirective($parse, utils) {
@@ -238,12 +266,13 @@ module.directive('a', function () {
         /* link */
         function disableLink($scope, $elem, $attrs) {
 
-            if (!$attrs.disable) {
-                console.warn('"disable" directive requires an attribute value to evaluate.');
+            var attrVal = $attrs[directiveName];
+            if (!attrVal) {
+                console.warn('disable directive requires an attribute value to evaluate.');
                 return;
             }
 
-            var getter = $parse($attrs.disable);
+            var getter = $parse(attrVal);
 
             $scope.$watch(function () {
                 return getter($scope);
@@ -268,7 +297,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('and', AndDirective);
+    var directiveName = ruiDirectiveName('and');
+
+    module.directive(directiveName, AndDirective);
 
     AndDirective.$inject = ['$parse'];
 
@@ -285,12 +316,14 @@ module.directive('a', function () {
 
         /* link */
         function andLink($scope, $elem, $attrs, ngModel) {
-            if (!$attrs.and) {
-                console.warn('"and" directive requires expression to evaluate.');
+
+            var attrVal = $attrs[directiveName];
+            if (!attrVal) {
+                console.warn('and directive requires expression to evaluate.');
                 return;
             }
 
-            var getter = $parse($attrs.and);
+            var getter = $parse(attrVal);
 
             // watch for changes in attribute evaluation
             $scope.$watch(function () {
@@ -318,9 +351,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('intModel', IntModelDirective);
+    var directiveName = ruiDirectiveName('intModel');
 
-    IntModelDirective.$inject = ['rawUI.utils'];
+    module.directive(directiveName, IntModelDirective);
+
+    IntModelDirective.$inject = [ruiServiceName('utils')];
 
     /* directive */
     function IntModelDirective(utils) {
@@ -362,9 +397,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('toggle', ToggleDirective);
+    var directiveName = ruiDirectiveName('toggle');
 
-    ToggleDirective.$inject = ['$parse', 'rawUI.utils'];
+    module.directive(directiveName, ToggleDirective);
+
+    ToggleDirective.$inject = ['$parse', ruiServiceName('utils')];
 
     /* directive */
     function ToggleDirective($parse, utils) {
@@ -378,7 +415,14 @@ module.directive('a', function () {
 
         /* link */
         function toggleLink($scope, $elem, $attrs) {
-            var getter = $parse($attrs.toggle);
+
+            var attrVal = $attrs[directiveName];
+            if (!attrVal) {
+                console.warn('hoverToggle directive requires an expression to evaluate.');
+                return;
+            }
+
+            var getter = $parse(attrVal);
 
             $elem.on('click', click);
             
@@ -418,9 +462,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('hoverToggle', HoverToggleDirective);
+    var directiveName = ruiDirectiveName('hoverToggle');
 
-    HoverToggleDirective.$inject = ['$parse', '$timeout', 'rawUI.utils'];
+    module.directive(directiveName, HoverToggleDirective);
+
+    HoverToggleDirective.$inject = ['$parse', '$timeout', ruiServiceName('utils')];
 
     /* directive */
     function HoverToggleDirective($parse, $timeout, utils) {
@@ -435,7 +481,13 @@ module.directive('a', function () {
         /* link */
         function toggleLink($scope, $elem, $attrs) {
 
-            var getter = $parse($attrs.hoverToggle),
+            var attrVal = $attrs[directiveName];
+            if (!attrVal) {
+                console.warn('hoverToggle directive requires an expression to evaluate.');
+                return;
+            }
+
+            var getter = $parse(attrVal),
                 delay = 0,
                 promise;
 
@@ -445,7 +497,7 @@ module.directive('a', function () {
                 delay = utils.parseInt(val, 0);
             });
 
-            function mouseEnter(e) {
+            function mouseEnter() {
                 if ($elem.hasClass('disabled'))
                     return;
 
@@ -459,7 +511,7 @@ module.directive('a', function () {
                 }, delay);
             }
 
-            function mouseLeave(e) {
+            function mouseLeave() {
                 if ($elem.hasClass('disabled'))
                     return;
 
@@ -483,7 +535,7 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.service('rawUI.utils', UtilsService);
+    module.service(ruiServiceName('utils'), UtilsService);
 
     UtilsService.$inject = ['$timeout'];
 
@@ -940,9 +992,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.service('rawUI.inputControls', InputControlsService);
+    module.service(ruiServiceName('inputControls'), InputControlsService);
 
-    InputControlsService.$inject = ['rawUI.utils'];
+    InputControlsService.$inject = [ruiServiceName('utils')];
 
     /* service */
     function InputControlsService(utils) {
@@ -1154,35 +1206,14 @@ module.directive('a', function () {
  *
  * Indicates an element is an input control or container for an input control and should add the '.has-value' class
  * if the input has a value.
- * 
- * Useful for elements not included in library such as custom textbox. 
- * (can still be used on library controls for styling purposes, but not required)
- * 
- * Example:
- * 
- * <div class="control textbox">
- *     <input type="text" id="myText">
- *     <label for="myText">Default Text</label>
- * </div>
- * 
- * The markup above can be styled to have default text overlaying the input. CSS can be
- * used to hide the default text when the text input is given focus.
- * 
- * With the control directive, the textbox can be styled to hide the default text
- * whenever the input has a value. With a value in the text input, the above markup 
- * would become:
- * 
- * <div class="control textbox has-value">
- *     <input type="text" id="myText">
- *     <label for="myText">Default Text</label>
- * </div>
- * 
  */
 (function () {
+
+    var directiveName = ruiDirectiveName('control');
     
-    module.directive('control', ControlDirective);
+    module.directive(directiveName, ControlDirective);
     
-    ControlDirective.$inject = ['rawUI.inputControls'];
+    ControlDirective.$inject = [ruiServiceName('inputControls')];
     
     /* directive */
     function ControlDirective(controls) {
@@ -1213,15 +1244,307 @@ module.directive('a', function () {
 
 
 /*
+ * SERVICE: date utils
+ * 
+ * Provides date manipulation utilities.
+ */
+(function () {
+
+    module.service(ruiServiceName('dateUtils'), DateUtilsService);
+
+    DateUtilsService.$inject = [ruiServiceName('utils')];
+
+    /* service */
+    function DateUtilsService(utils) {
+
+        var service = this;
+
+        /**
+         * Parse a potential date value into a Date object.
+         * 
+         * @param   {object}  date  The potential date value to parse.
+         *                          
+         * @returns {Date|null}
+         */
+        this.parseDate = parseDate;
+
+        /**
+         * Get the number of days in a month.
+         * 
+         * Omit all arguments for current month.
+         * 
+         * @param  {number}  year   The year of the month to check. 
+         * @param  {number}  month  The 1 based index of the month to check.
+         * 
+         * @returns {number}
+         */
+        this.daysInMonth = daysInMonth;
+
+        /**
+         * Create a new modified Date object using an existing Date.
+         * 
+         * @param {Date}    date   The source Date object.
+         * @param {object}  mods   An object with properties containing date components to modify.
+         *                         All properties in the object are optional. If not provided, the value
+         *                         from the 'date' argument is used.
+         *                         
+         *                         mods = {
+         *                             year: 2015,
+         *                             month: 1, // january
+         *                             day: 10,
+         *                             hour: 5,
+         *                             minute: 6,
+         *                             seconds: 55,
+         *                             milliseconds: 900
+         *                         };
+         */
+        this.modifyDate = modifyDate;
+
+
+        /**
+         * Create a new Date object from the supplied Date object and add the
+         * specified number of years.
+         *
+         * @param {Date}    date   The source date.
+         * @param {number}  years  The number of years to add. Can be negative.
+         */
+        this.addYears = addYears;
+
+        /**
+         * Create a new Date object from the supplied Date object and add the
+         * specified number of months.
+         *
+         * @param {Date}    date    The source date.
+         * @param {number}  months  The number of months to add. Can be negative.
+         */
+        this.addMonths = addMonths;
+
+        /**
+         * Create a new Date object from the specified Date object and add the
+         * specified number of days.
+         *
+         * @param {Date}    date   The source date.
+         * @param {number}  days   The number of days to add. Can be negative.
+         */
+        this.addDays = addDays;
+
+        /**
+         * Create a new Date object from the supplied Date object and add the
+         * specified number of hours.
+         *
+         * @param {Date}    date   The source date.
+         * @param {number}  hours  The number of hours to add. Can be negative.
+         */
+        this.addHours = addHours;
+
+        /**
+         * Create a new Date object from the supplied Date object and add the
+         * specified number of minutes.
+         *
+         * @param {Date}    date     The source date.
+         * @param {number}  minutes  The number of minutes to add. Can be negative.
+         */
+        this.addMinutes = addMinutes;
+
+        /**
+         * Create a new Date object from the supplied Date object and add the
+         * specified number of seconds.
+         *
+         * @param {Date}    date     The source date.
+         * @param {number}  seconds  The number of seconds to add. Can be negative.
+         */
+        this.addSeconds = addSeconds;
+
+
+
+        function addDays(date, days) {
+            var year = date.getFullYear(),
+                month = date.getMonth() + 1,
+                day = date.getDate() + parseInt(days);
+
+            while (day <= 0) {
+                month--;
+                day = service.daysInMonth(year, month) + day;
+                while (month <= 0) {
+                    month = 12 + month;
+                    year--;
+                }
+            }
+            service.modifyDate(date, {
+                year: year,
+                month: month,
+                day: day
+            });
+        }
+
+        function addHours(date, hours) {
+            var year = date.getFullYear(),
+                month = date.getMonth() + 1,
+                day = date.getDate(),
+                hour = date.getHours() + parseInt(hours);
+
+            while (hour <= 0) {
+                day--;
+                hour = 24 + hour;
+                while (day <= 0) {
+                    month--;
+                    day = service.daysInMonth(year, month) + day;
+                    while (month <= 0) {
+                        month = 12 + month;
+                        year--;
+                    }
+                }
+            }
+
+            service.modifyDate(date, {
+                year: year,
+                month: month,
+                day: day,
+                hours: hour
+            });
+        }
+
+        function addMinutes(date, minutes) {
+
+            var year = date.getFullYear(),
+                month = date.getMonth() + 1,
+                day = date.getDate(),
+                hour = date.getHours(),
+                minute = date.getMinutes() + parseInt(minutes);
+
+            while (minute <= 0) {
+                hour--;
+                minute = 60 + minute;
+                while (hour <= 0) {
+                    day--;
+                    hour = 24 + hour;
+                    while (day <= 0) {
+                        month--;
+                        day = service.daysInMonth(year, month) + day;
+                        while (month <= 0) {
+                            month = 12 + month;
+                            year--;
+                        }
+                    }
+                }
+            }
+            service.modifyDate(date, {
+                year: year,
+                month: month,
+                day: day,
+                hours: hour,
+                minutes: minute
+            });
+        }
+
+        function addMonths(date, months) {
+            var year = date.getFullYear(),
+                month = date.getMonth() + 1 + parseInt(months);
+
+            while (month <= 0) {
+                year--;
+                month = 12 + month;
+            }
+            service.modifyDate(date, {
+                year: year,
+                month: month
+            });
+        }
+
+        function addSeconds(date, seconds) {
+
+            var year = date.getFullYear(),
+                month = date.getMonth() + 1,
+                day = date.getDate(),
+                hour = date.getHours(),
+                minute = date.getMinutes(),
+                second = date.getSeconds() + seconds;
+
+            while (second <= 0) {
+                minute--;
+                second = 60 + second;
+                while (minute <= 0) {
+                    hour--;
+                    minute = 60 + minute;
+                    while (hour <= 0) {
+                        day--;
+                        hour = 24 + hour;
+                        while (day <= 0) {
+                            month--;
+                            day = service.daysInMonth(year, month) + day;
+                            while (month <= 0) {
+                                month = 12 + month;
+                                year--;
+                            }
+                        }
+                    }
+                }
+            }
+            service.modifyDate(date, {
+                year: year,
+                month: month,
+                day: day,
+                hours: hour,
+                minutes: minute,
+                seconds: second
+            });
+        }
+
+
+        function addYears(date, years) {
+            return service.modifyDate(date, {
+                year: date.getFullYear() + years
+            });
+        }
+
+        function daysInMonth(year, month) {
+            if (utils.isDefined(year))
+                return new Date(parseInt(year), parseInt(month), 0).getDate();
+
+            var now = new Date();
+            return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        }
+
+        function modifyDate(date, mods) {
+            
+            var year = utils.parseInt(mods.year, date.getFullYear()),
+                month = utils.parseInt(mods.month, date.getMonth() + 1),
+                day = utils.parseInt(mods.day, date.getDate()),
+                hours = utils.parseInt(mods.hours, date.getHours()),
+                minutes = utils.parseInt(mods.minutes, date.getMinutes()),
+                seconds = utils.parseInt(mods.seconds, date.getSeconds()),
+                milliseconds = utils.parseInt(mods.milliseconds, date.getMilliseconds());
+
+            return new Date(year, month - 1, day, hours, minutes, seconds, milliseconds);
+        }
+
+        function parseDate(date) {
+
+            if (date) {
+                if (utils.isProto(date, '[object Date]')) {
+                    return date;
+                }
+
+                if (utils.is(date, 'string') || utils.is(date, 'number')) {
+                    return new Date(date);
+                }
+            }
+            return null;
+        }
+    }
+}());
+
+
+/*
  * Factory: CalendarView
  * 
  * Provides calendar functionality.
  */
 (function () {
 
-    module.factory('rawUI.CalendarView', CalendarViewFactory);
+    module.factory(ruiFactoryName('CalendarView'), CalendarViewFactory);
 
-    CalendarViewFactory.$inject = ['rawUI.utils', 'rawUI.dateUtils', 'rawUI.calendars'];
+    CalendarViewFactory.$inject = [ruiServiceName('utils'), ruiServiceName('dateUtils'), ruiServiceName('calendars')];
 
     /* service */
     function CalendarViewFactory(utils, dateUtils, service) {
@@ -1241,7 +1564,7 @@ module.directive('a', function () {
                 minYear = currYear - 25,
                 maxYear = currYear + 25,
                 yearArray,
-                monthData,
+                monthData = [],
                 itemName,
                 sync = options && utils.parseBool(options.isSyncView),
                 multiSelect = options && utils.parseBool(options.isMultiSelect) && !sync;
@@ -1463,16 +1786,13 @@ module.directive('a', function () {
              *  [
              *     // week 1 row
              *     [ 
-             *         // sunday
-             *         {
-             *             // empty, not in current month
-             *         },
-             *         // monday
+             *         // day
              *         {
              *             year: 2015,
              *             month: 12,
              *             day: 28.
-             *             selected: true,
+             *             isViewDay: true // false would mean the date isn't in the current year/month of the calendar view
+             *             isSelected: true,
              *             values: [new Date(2015, 12 - 1, 28)]  /* Array of selected objects that fall on this date
              *         }
              *         // tuesday...
@@ -1802,7 +2122,6 @@ module.directive('a', function () {
                 yearArray = createYearArray(minYear, maxYear);
             }
 
-
             function yearSetter(val) {
                 val = utils.parseInt(val, year);
                 if (isValidYear(val)) {
@@ -1821,40 +2140,79 @@ module.directive('a', function () {
 
             function updateData() {
 
-                var y = year,
-                    m = month,
-                    first = new Date(y, m - 1, 1),
+                var total = dateUtils.daysInMonth(year, month),
+                    totalPrevDays = dateUtils.daysInMonth(month === 1 ? year - 1: year, month - 1),
+                    first = new Date(year, month - 1, 1),
                     firstDay = first.getDay(),
-                    total = dateUtils.daysInMonth(y, m),
-                    data = [],
-                    row;
+                    lastDay = total + firstDay,
+                    weekIndex = -1,
+                    dayWeekIndex = -1,
+                    week, i;
 
                 // add dates
-                for (var i = 0; i < total + firstDay; i++) {
+                for (i = 0; i < lastDay || dayWeekIndex < 6; i++) {
+
+                    // check for new week
                     if (i % 7 === 0) {
-                        row = [];
-                        data.push(row);
+                        weekIndex++;
+                        dayWeekIndex = -1;
+
+                        week = monthData[weekIndex];
+                        if (!week) {
+                            week = [];
+                            monthData[weekIndex] = week;
+                        }
                     }
 
-                    // pad beginning of month
-                    if (i < firstDay) {
-                        row.push({});
-                        continue;
+                    dayWeekIndex++;
+
+                    // get day info
+                    var dayObj = week[dayWeekIndex],
+                        dayYear = (function () {
+                            if (i < firstDay && month === 1) return year - 1;
+                            if (i >= lastDay && month === 12) return year + 1;
+                            return year;
+                        }()),
+                        dayMonth = (function () {
+                            if (i < firstDay) {
+                                if (month === 1) return 12;
+                                return month - 1;
+                            }
+                            if (i >= lastDay) {
+                                if (month === 12) return 1;
+                                return month + 1;
+                            }
+                            return month;
+                        }()),
+                        dayDay = (function () {
+                            if (i < firstDay) return totalPrevDays - firstDay + i + 1;
+                            if (i >= lastDay) return i - lastDay + 1;
+                            return  i - firstDay + 1;
+                        }()),
+                        values = getSelectedItems(dayYear, dayMonth, dayDay);
+
+                    if (!dayObj) {
+                        // add Day object.
+                        dayObj = new Day(dayYear, dayMonth, dayDay);
+                        week[dayWeekIndex] = dayObj;
+                    }
+                    else {
+                        // update existing Day object.
+                        dayObj.year = dayYear;
+                        dayObj.month = dayMonth;
+                        dayObj.day = dayDay;
                     }
 
-                    var day = i - firstDay + 1,
-                        values = getSelectedItems(y, m, day);
-
-                    row.push({
-                        year: y,
-                        month: m,
-                        day: day,
-                        selected: values.length > 0,
-                        values: values
-                    });
+                    // update selected values for day
+                    dayObj.values.length = 0;
+                    utils.pushAll(dayObj.values, values);
                 }
 
-                monthData = data;
+                // trim extra weeks
+                while (monthData.length > weekIndex + 1) {
+                    monthData.pop();
+                }
+
                 utils.triggerUpdate();
             }
 
@@ -1889,301 +2247,92 @@ module.directive('a', function () {
                 }
                 return array;
             }
+
+            /**
+             * Calendar Day data object.
+             *
+             * @param  {number}  dayYear   The full year
+             * @param  {number}  dayMonth  The 1 based month.
+             * @param  {number}  dayDay    The day of the month.
+             *
+             * @constructor
+             */
+            function Day (dayYear, dayMonth, dayDay) {
+
+                var values = [];
+
+                /**
+                 * Get full year.
+                 */
+                defineProperty(this, 'year', {
+                    get: function () {
+                        return dayYear;
+                    },
+                    set: function (val) {
+                        dayYear = utils.parseInt(val, dayYear);
+                    },
+                    enumerable: true
+                });
+
+                /**
+                 * Get month (1 based).
+                 */
+                defineProperty(this, 'month', {
+                    get: function () {
+                        return dayMonth;
+                    },
+                    set: function (val) {
+                        dayMonth = utils.parseInt(val, dayMonth);
+                    },
+                    enumerable: true
+                });
+
+                /**
+                 * Get day of the month.
+                 */
+                defineProperty(this, 'day', {
+                    get: function () {
+                        return dayDay;
+                    },
+                    set: function (val) {
+                        dayDay = utils.parseInt(val, dayDay);
+                    },
+                    enumerable: true
+                });
+
+                /**
+                 * Determine if the date is selected.
+                 */
+                defineProperty(this, 'isViewDay', {
+                    get: function () {
+                        return dayYear === year && dayMonth === month;
+                    },
+                    enumerable: true
+                });
+
+                /**
+                 * Determine if the date is selected.
+                 */
+                defineProperty(this, 'isSelected', {
+                    get: function () {
+                        return values.length > 0;
+                    },
+                    enumerable: true
+                });
+
+                /**
+                 * Get selected items.
+                 */
+                defineProperty(this, 'values', {
+                    get: function () {
+                        return values;
+                    },
+                    enumerable: true
+                });
+            }
         }
     }
 
-}());
-
-
-/*
- * SERVICE: date utils
- * 
- * Provides date manipulation utilities.
- */
-(function () {
-
-    module.service('rawUI.dateUtils', DateUtilsService);
-
-    DateUtilsService.$inject = ['rawUI.utils'];
-
-    /* service */
-    function DateUtilsService(utils) {
-
-        var service = this;
-
-        /**
-         * Parse a potential date value into a Date object.
-         * 
-         * @param   {object}  date  The potential date value to parse.
-         *                          
-         * @returns {Date|null}
-         */
-        this.parseDate = parseDate;
-
-        /**
-         * Get the number of days in a month.
-         * 
-         * Omit all arguments for current month.
-         * 
-         * @param  {number}  year   The year of the month to check. 
-         * @param  {number}  month  The 1 based index of the month to check.
-         * 
-         * @returns {number}
-         */
-        this.daysInMonth = daysInMonth;
-
-        /**
-         * Create a new modified Date object using an existing Date.
-         * 
-         * @param {Date}    date   The source Date object.
-         * @param {object}  mods   An object with properties containing date components to modify.
-         *                         All properties in the object are optional. If not provided, the value
-         *                         from the 'date' argument is used.
-         *                         
-         *                         mods = {
-         *                             year: 2015,
-         *                             month: 1, // january
-         *                             day: 10,
-         *                             hour: 5,
-         *                             minute: 6,
-         *                             seconds: 55,
-         *                             milliseconds: 900
-         *                         };
-         */
-        this.modifyDate = modifyDate;
-
-
-        /**
-         * Create a new Date object from the supplied Date object and add the
-         * specified number of years.
-         *
-         * @param {Date}    date   The source date.
-         * @param {number}  years  The number of years to add. Can be negative.
-         */
-        this.addYears = addYears;
-
-        /**
-         * Create a new Date object from the supplied Date object and add the
-         * specified number of months.
-         *
-         * @param {Date}    date    The source date.
-         * @param {number}  months  The number of months to add. Can be negative.
-         */
-        this.addMonths = addMonths;
-
-        /**
-         * Create a new Date object from the specified Date object and add the
-         * specified number of days.
-         *
-         * @param {Date}    date   The source date.
-         * @param {number}  days   The number of days to add. Can be negative.
-         */
-        this.addDays = addDays;
-
-        /**
-         * Create a new Date object from the supplied Date object and add the
-         * specified number of hours.
-         *
-         * @param {Date}    date   The source date.
-         * @param {number}  hours  The number of hours to add. Can be negative.
-         */
-        this.addHours = addHours;
-
-        /**
-         * Create a new Date object from the supplied Date object and add the
-         * specified number of minutes.
-         *
-         * @param {Date}    date     The source date.
-         * @param {number}  minutes  The number of minutes to add. Can be negative.
-         */
-        this.addMinutes = addMinutes;
-
-        /**
-         * Create a new Date object from the supplied Date object and add the
-         * specified number of seconds.
-         *
-         * @param {Date}    date     The source date.
-         * @param {number}  seconds  The number of seconds to add. Can be negative.
-         */
-        this.addSeconds = addSeconds;
-
-
-
-        function addDays(date, days) {
-            var year = date.getFullYear(),
-                month = date.getMonth() + 1,
-                day = date.getDate() + parseInt(days);
-
-            while (day <= 0) {
-                month--;
-                day = service.daysInMonth(year, month) + day;
-                while (month <= 0) {
-                    month = 12 + month;
-                    year--;
-                }
-            }
-            service.modifyDate(date, {
-                year: year,
-                month: month,
-                day: day
-            });
-        }
-
-        function addHours(date, hours) {
-            var year = date.getFullYear(),
-                month = date.getMonth() + 1,
-                day = date.getDate(),
-                hour = date.getHours() + parseInt(hours);
-
-            while (hour <= 0) {
-                day--;
-                hour = 24 + hour;
-                while (day <= 0) {
-                    month--;
-                    day = service.daysInMonth(year, month) + day;
-                    while (month <= 0) {
-                        month = 12 + month;
-                        year--;
-                    }
-                }
-            }
-
-            service.modifyDate(date, {
-                year: year,
-                month: month,
-                day: day,
-                hours: hour
-            });
-        }
-
-        function addMinutes(date, minutes) {
-
-            var year = date.getFullYear(),
-                month = date.getMonth() + 1,
-                day = date.getDate(),
-                hour = date.getHours(),
-                minute = date.getMinutes() + parseInt(minutes);
-
-            while (minute <= 0) {
-                hour--;
-                minute = 60 + minute;
-                while (hour <= 0) {
-                    day--;
-                    hour = 24 + hour;
-                    while (day <= 0) {
-                        month--;
-                        day = service.daysInMonth(year, month) + day;
-                        while (month <= 0) {
-                            month = 12 + month;
-                            year--;
-                        }
-                    }
-                }
-            }
-            service.modifyDate(date, {
-                year: year,
-                month: month,
-                day: day,
-                hours: hour,
-                minutes: minute
-            });
-        }
-
-        function addMonths(date, months) {
-            var year = date.getFullYear(),
-                month = date.getMonth() + 1 + parseInt(months);
-
-            while (month <= 0) {
-                year--;
-                month = 12 + month;
-            }
-            service.modifyDate(date, {
-                year: year,
-                month: month
-            });
-        }
-
-        function addSeconds(date, seconds) {
-
-            var year = date.getFullYear(),
-                month = date.getMonth() + 1,
-                day = date.getDate(),
-                hour = date.getHours(),
-                minute = date.getMinutes(),
-                second = date.getSeconds() + seconds;
-
-            while (second <= 0) {
-                minute--;
-                second = 60 + second;
-                while (minute <= 0) {
-                    hour--;
-                    minute = 60 + minute;
-                    while (hour <= 0) {
-                        day--;
-                        hour = 24 + hour;
-                        while (day <= 0) {
-                            month--;
-                            day = service.daysInMonth(year, month) + day;
-                            while (month <= 0) {
-                                month = 12 + month;
-                                year--;
-                            }
-                        }
-                    }
-                }
-            }
-            service.modifyDate(date, {
-                year: year,
-                month: month,
-                day: day,
-                hours: hour,
-                minutes: minute,
-                seconds: second
-            });
-        }
-
-
-        function addYears(date, years) {
-            return service.modifyDate(date, {
-                year: date.getFullYear() + years
-            });
-        }
-
-        function daysInMonth(year, month) {
-            if (utils.isDefined(year))
-                return new Date(parseInt(year), parseInt(month), 0).getDate();
-
-            var now = new Date();
-            return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        }
-
-        function modifyDate(date, mods) {
-            
-            var year = utils.parseInt(mods.year, date.getFullYear()),
-                month = utils.parseInt(mods.month, date.getMonth() + 1),
-                day = utils.parseInt(mods.day, date.getDate()),
-                hours = utils.parseInt(mods.hours, date.getHours()),
-                minutes = utils.parseInt(mods.minutes, date.getMinutes()),
-                seconds = utils.parseInt(mods.seconds, date.getSeconds()),
-                milliseconds = utils.parseInt(mods.milliseconds, date.getMilliseconds());
-
-            return new Date(year, month - 1, day, hours, minutes, seconds, milliseconds);
-        }
-
-        function parseDate(date) {
-
-            if (date) {
-                if (utils.isProto(date, '[object Date]')) {
-                    return date;
-                }
-
-                if (utils.is(date, 'string') || utils.is(date, 'number')) {
-                    return new Date(date);
-                }
-            }
-            return null;
-        }
-    }
 }());
 
 
@@ -2194,9 +2343,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.service('rawUI.calendars', CalendarService);
+    module.service(ruiServiceName('calendars'), CalendarService);
 
-    CalendarService.$inject = ['rawUI.utils'];
+    CalendarService.$inject = [ruiServiceName('utils')];
 
     /* service */
     function CalendarService(utils) {
@@ -2299,97 +2448,17 @@ module.directive('a', function () {
 /* DIRECTIVE: (calendar-box, data-calendar-box, .calendar-box)
  * 
  * A calendar element with various configurations.
- * 
- * In most basic form, used as:
- *  
- *      <calendar-box ng-model="data"></calendar-box>
- *      
- * (data-ng-model) is a required directive.
- *      
- * After the directive is linked, the above becomes:
- * 
- *      <calendar-box ng-model="data">
- *          <div class="calendar">
- *              <div class="calendar-week calendar-header">
- *                   <span class="calendar-day">Su</span>
- *                   <span class="calendar-day">Mo</span>
- *                   <span class="calendar-day">Tu</span>
- *                   <span class="calendar-day">We</span>
- *                   <span class="calendar-day">Th</span>
- *                   <span class="calendar-day">Fr</span>
- *                   <span class="calendar-day">Sa</span>
- *              </div>
- *              <div class="calendar-week" ng-repeat="row in calendarData()">
- *                   <span class="calendar-day" ng-repeat="day in row" ng-class="{selected:day.selected,disabled:day.disabled}">
- *                       <a href="#" ng-class="{hidden:!day.year}" ng-click="select(day, $event)">{{day.day}}</a>
- *                   </span>
- *              </div>
- *          </div>
- *      </calendar-box>
- *      
- * The added elements are appended, allowing existing elements before the calendar that have access to the calendar scope.
- * 
- * If more control is needed over the placement of the calendar, include a div classed '.calendar' to indicate where the
- * calendar should be appended:
- * 
- *     <calendar-box ng-model="data">
- *         <div class="my-controls">Top controls</div>
- *         <div class="calendar"></div>
- *         <div class="my-controls">Bottom controls</div>
- *     </calendar-box>
- *     
- * A custom header '.calendar-header' can be used by including it:
- * 
- *     <calendar-box ng-model="data">
- *          <div class="calendar-week calendar-header">
- *               <span class="calendar-day">Sunday!</span>
- *               <span class="calendar-day">Monday!</span>
- *               <span class="calendar-day">Tuesday!</span>
- *               <span class="calendar-day">Wednesday!</span>
- *               <span class="calendar-day">Thursday!</span>
- *               <span class="calendar-day">Friday!</span>
- *               <span class="calendar-day">Saturday!</span>
- *          </div>
- *      </calendar-box>
- * 
- * Additional attributes:
- *      (data-multi-select)  Allows selecting and deselecting multiple dates. Data model is expected to be an Array
- *                           Cannot be used with (data-sync-view) attribute.
- *                           
- *      (data-sync-view)  Syncs the data model to the calendar view. If the month or year of the calendar view is changed, 
- *                        the month or year of the data model is also changed. Cannot be used with (data-multi-select)
- *                        
- *      (data-read-only)  Renders calendar without links for the user to change the selected date.
- *      
- *      (data-year-radius=)  Set the min and max year of the calendar based on a radius around the current year. Can be a static
- *                          number or an expression.
- *                          
- *      (data-min-year=)  Set the min year of the calendar. Can be a static number or an expression.
- *      
- *      (data-max-year=)  Set the max year of the calendar. Can be a static number or an expression.
- *      
- *      (data-year=)  Set the calendar view year. Can be a static number or an expression.
- *      
- *      (data-month=)  Set the calendar view month. Can be a static number or an expression. (1 based month index)
- *      
- * Scope functions/variables:
- * 
- *      calendar - The CalendarView instance. This contains functions that can be used by control elements to manipulate 
- *                 or display calendar data. See the ruiCalendarView service under the #createView function.
- *                 
- *      year - The calendar view year.
- *      month - The calendar view month.
- *      minYear - The calender min year.
- *      maxYear - The calendar max year.
- *      showSelected() - Change the calendar view to the year and month of the closest selected value.
  */
 (function () {
 
+    var directiveName = ruiDirectiveName('calendarBox');
+
     document.registerElement && document.registerElement('calendar-box');
 
-    module.directive('calendarBox', CalendarBoxDirective);
+    module.directive(directiveName, CalendarBoxDirective);
 
-    CalendarBoxDirective.$inject = ['$compile', 'rawUI.calendars', 'rawUI.CalendarView', 'rawUI.utils', 'rawUI.inputControls'];
+    CalendarBoxDirective.$inject = ['$compile', ruiServiceName('calendars'),
+        ruiFactoryName('CalendarView'), ruiServiceName('utils'), ruiServiceName('inputControls')];
 
     /* directive */
     function CalendarBoxDirective($compile, calendars, CalendarView, utils, controls) {
@@ -2443,14 +2512,14 @@ module.directive('a', function () {
                     if (templateContainer.length) {
                         return templateContainer.html();
                     } else if (utils.isDefined($attrs.readOnly)) {
-                        return '<span ng-class="{hidden:!day.year}">{{day.day}}</a>';
+                        return '<span ng-class="{hidden:!day.isViewDay}">{{day.day}}</a>';
                     }
-                    return '<a href="#" ng-class="{hidden:!day.year}" ng-click="calendar.select(day, $event)">{{day.day}}</a>'
+                    return '<a href="#" ng-class="{hidden:!day.isViewDay}" ng-click="calendar.select(day, $event)">{{day.day}}</a>'
                 }()),
 
                 weekRows = ae($compile((function () {
-                    var html = '<div class="calendar-week" ng-repeat="row in calendar.data">';
-                    html += '<span class="calendar-day" ng-repeat="day in row" ng-class="{selected:day.selected,disabled:day.disabled}">';
+                    var html = '<div class="calendar-week" ng-repeat="week in calendar.data">';
+                    html += '<span class="calendar-day" ng-repeat="day in week" ng-class="{active:day.isSelected}">';
                     html += day;
                     html += '</span></div>';
                     return html;
@@ -2524,9 +2593,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.service('rawUI.modals', ModalsService);
+    module.service(ruiServiceName('modals'), ModalsService);
 
-    ModalsService.$inject = ['$rootScope', '$q', '$http', '$compile', 'rawUI.utils'];
+    ModalsService.$inject = ['$rootScope', '$q', '$http', '$compile', ruiServiceName('utils')];
 
     /* service */
     function ModalsService($rootScope, $q, $http, $compile, utils) {
@@ -2647,6 +2716,10 @@ module.directive('a', function () {
             else {
 
                 dataObj = dataObj || {};
+
+                if (utils.is(dataObj, 'string')) {
+                    dataObj = service.data(dataObj) || dataObj;
+                }
 
                 scope = scope ? scope.$new(false) : $rootScope.$new(true);
 
@@ -2793,7 +2866,7 @@ module.directive('a', function () {
 
     module.directive('body', ModalBodyDirective);
 
-    ModalBodyDirective.$inject = ['rawUI.modals'];
+    ModalBodyDirective.$inject = [ruiServiceName('modals')];
 
     /* directive */
     function ModalBodyDirective(modals) {
@@ -2823,9 +2896,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('modalClose', ModalCloseDirective);
+    var directiveName = ruiDirectiveName('modalClose');
 
-    ModalCloseDirective.$inject = ['rawUI.modals'];
+    module.directive(directiveName, ModalCloseDirective);
+
+    ModalCloseDirective.$inject = [ruiServiceName('modals')];
 
     /* directive */
     function ModalCloseDirective(modals) {
@@ -2854,7 +2929,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('modalButton', ModalButtonDirective);
+    var directiveName = ruiDirectiveName('modalButton');
+
+    module.directive(directiveName, ModalButtonDirective);
 
     /* directive */
     function ModalButtonDirective() {
@@ -2869,27 +2946,37 @@ module.directive('a', function () {
         /* link */
         function modalButtonLink($scope, $elem, $attrs) {
 
-            var name = $attrs.modalButton,
-                data = $scope.modalData;
-
-            if (!name) {
-                console.warn('modalButton attribute directive requires button name as value.');
-                return;
-            }
-
+            var click, data = $scope.modalData;
             if (!data)
                 return;
 
-            var click = data[name];
-            if (click === true)
-                return;
+            $attrs.$observe(directiveName, function (name) {
 
-            if (typeof click === 'function') {
-                $elem.on('click', click);
-            }
-            else {
-                $elem.remove();
-            }
+                // remove existing click handler
+                if (click) {
+                    $elem.off('click', click)
+                }
+
+                if (!name) {
+                    $elem.addClass('hidden');
+                    console.warn('modalButton attribute directive requires button name as value.');
+                    return;
+                }
+
+                $elem.removeClass('hidden');
+
+                click = data[name];
+                if (click === true) {
+                    return;
+                }
+
+                if (typeof click === 'function') {
+                    $elem.on('click', click);
+                }
+                else {
+                    $elem.addClass('hidden');
+                }
+            });
         }
     }
 }());
@@ -2907,7 +2994,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('modalComponent', ModalComponentDirective);
+    var directiveName = ruiDirectiveName('modalComponent');
+
+    module.directive(directiveName, ModalComponentDirective);
 
     /* directive */
     function ModalComponentDirective() {
@@ -2922,28 +3011,62 @@ module.directive('a', function () {
         /* link */
         function modalComponentLink($scope, $elem, $attrs) {
 
-            if (!$attrs.modalComponent) {
-                console.warn('modalComponent attribute directive requires component name as value.');
-                return;
-            }
+            var isSetup,
+                defInner = $elem.children().length ? $elem.children() : $elem.html(),
+                data = $scope.modalData;
 
-            if (!$scope.modalData)
+            if (!data)
                 return;
 
-            var name = $attrs.modalComponent,
+            $attrs.$observe(directiveName, function (name) {
+
+                if (!name) {
+                    $elem.addClass('hidden');
+                    reset();
+                    console.warn('modalComponent attribute directive requires component name as value.');
+                    return;
+                }
+
                 inner = $scope.modalData[name];
 
-            if (typeof inner === 'function') {
-                inner = inner($scope.modalData);
+                if (typeof inner === 'function') {
+                    inner = inner($scope.modalData);
+                }
+
+                // replace element html with inner
+                if (inner) {
+                    $elem.html('').append(inner);
+                }
+                // remove element if no default text is included
+                else if (!hasDefaultContent()) {
+                    $elem.remove();
+                }
+                else if (isSetup) {
+                    reset();
+                }
+
+                isSetup = true;
+            });
+
+            function reset() {
+                $elem.html('').append(defInner);
             }
 
-            // replace element html with inner
-            if (inner) {
-                $elem.html('').append(inner);
-            }
-            // remove element if no default text is included
-            else if ($elem.html().trim() === '') {
-                $elem.remove();
+            function hasDefaultContent() {
+
+                if (!defInner)
+                    return false;
+
+                if (typeof defInner === 'string')
+                    return defInner.trim() !== '';
+
+                var html = '';
+                for (var i = 0; i < defInner.length; i++) {
+                    html += ae(defInner[i]).html().trim();
+                    if (html.length > 0)
+                        return true;
+                }
+                return false;
             }
         }
     }
@@ -2957,9 +3080,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('modalTemplate', ModalTemplateDirective);
+    var directiveName = ruiDirectiveName('modalTemplate');
 
-    ModalTemplateDirective.$inject = ['rawUI.modals'];
+    module.directive(directiveName, ModalTemplateDirective);
+
+    ModalTemplateDirective.$inject = [ruiServiceName('modals')];
 
     /* directive */
     function ModalTemplateDirective(modals) {
@@ -2974,7 +3099,7 @@ module.directive('a', function () {
         /* link */
         function modalTemplateLink($scope, $elem, $attrs) {
 
-            var name = $attrs.modalTemplate;
+            var name = $attrs[directiveName];
             if (!name) {
                 console.warn('modalTemplate attribute directive requires template name as value.');
                 return;
@@ -2992,10 +3117,12 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.service('rawUI.popups', PopupsService);
+    module.service(ruiServiceName('popups'), PopupsService);
+
+    PopupsService.$inject = [ruiServiceName('utils')];
 
     /* service */
-    function PopupsService() {
+    function PopupsService(utils) {
 
         var service = this,
             keepOpen = [],
@@ -3004,22 +3131,37 @@ module.directive('a', function () {
         /**
          * Toggle popup box open state.
          * 
-         * @param   {string}  id  The ID of the popup box.
+         * @param   {string}   id       The element ID of the popup box.
+         * @param   {boolean}  [state]  Set the popup state specifically instead of toggling.
          *
          * @returns {boolean}  The new state of the box.
          */
-        this.toggle = function (id) {
+        this.toggle = function (id, state) {
             closeAll(id);
-            return update(id, !states[id]);
+            return update(id, utils.isDefined(state) ? state : !states[id], 3);
         };
 
         /**
          * Close popup box.
-         * 
-         * @param {string}  id  The ID of the popup box.
+         *
+         * @param {string}  id  The element ID of the popup box.
+         */
+        this.open = function (id) {
+            if (!states[id]) {
+                closeAll(id);
+                return update(id, true, 3);
+            }
+        };
+
+        /**
+         * Close popup box.
+         *
+         * @param {string}  id  The element ID of the popup box.
          */
         this.close = function (id) {
-            update(id, false);
+            if (states[id]) {
+                update(id, false, 3);
+            }
         };
 
         /**
@@ -3130,10 +3272,16 @@ module.directive('a', function () {
 
 
         // update a popups visible state
-        function update(id, isOpen) {
-            states[id] = isOpen;
-            var box = ae(document.getElementById(id));
-            box.toggleClass('open', isOpen);
+        function update(id, isOpen, timeout) {
+            // timeout so that window event listener does not
+            // close the popup if this function is called in
+            // response to a click.
+            setTimeout(function () {
+                states[id] = isOpen;
+                var box = ae(document.getElementById(id));
+                box.toggleClass('open', isOpen);
+            }, timeout || 0);
+
             return isOpen;
         }
     }
@@ -3144,20 +3292,14 @@ module.directive('a', function () {
  * 
  * Popup element container that becomse visible or hides when a corresponding 
  * (data-popup-button) is clicked or a click is detected outside of the container.
- * 
- * The element the directive is applied to must have an ID attribute.
- * 
- * When the popup box is meant to be visible, the '.open' class is added.
- * 
- * A popup box can have child popup boxes. When child popup boxes are open, clicking 
- * the parent popup box closes all pen popups that are children of the clicked parent, 
- * but not the parent. Clicking outside of all popup boxes closes all popup boxes.
  */
 (function () {
 
-    module.directive('popupBox', PopupBoxDirective);
+    var directiveName = ruiDirectiveName('popupBox');
 
-    PopupBoxDirective.$inject = ['rawUI.popups'];
+    module.directive(directiveName, PopupBoxDirective);
+
+    PopupBoxDirective.$inject = [ruiServiceName('popups')];
 
     /* directive */
     function PopupBoxDirective(popups) {
@@ -3171,10 +3313,20 @@ module.directive('a', function () {
         /* link */
         function popupBoxLink($scope, $elem, $attrs) {
 
+            var id;
+
+            $attrs.$observe('id', function (val) {
+                if (id) {
+                    popups.close(id);
+                    $elem.removeClass('open');
+                }
+                id = val;
+            });
+
             $elem.prop('isPopupElement', true)
                 .on('click', function (e) {
 
-                    if (!$attrs.id) {
+                    if (!id) {
                         console.warn('popup-box directive requires ID attribute.');
                         return;
                     }
@@ -3196,7 +3348,7 @@ module.directive('a', function () {
                     e.stopPropagation();
 
                     // click came from this element or a child that is not a popup, close all child popups
-                    popups.closeChildren($attrs.id);
+                    popups.closeChildren(id);
                 });
         }
     }
@@ -3206,21 +3358,14 @@ module.directive('a', function () {
 /* DIRECTIVE: (data-popup-button)
  * 
  * Toggles the 'open' state of a (data-popup-box) element.
- * 
- * The attribute value is the value of the ID attribute of the (data-popup-box) element 
- * for which the button will toggle.
- * 
- * When the popup state is 'open', the '.active' class is added to the button element.
- * 
- * Attribute value is the ID of the popup container the button opens.
- * 
- * The popup button is allowed to be the same element as the popup box.
  */
 (function () {
 
-    module.directive('popupButton', PopupButtonDirective);
+    var directiveName = ruiDirectiveName('popupButton');
 
-    PopupButtonDirective.$inject = ['rawUI.utils', 'rawUI.popups'];
+    module.directive(directiveName, PopupButtonDirective);
+
+    PopupButtonDirective.$inject = [ruiServiceName('utils'), ruiServiceName('popups')];
 
     /* directive */
     function PopupButtonDirective(utils, popups) {
@@ -3235,15 +3380,20 @@ module.directive('a', function () {
         /* link */
         function popupButtonLink($scope, $elem, $attrs) {
 
-            var id = $attrs.popupButton;
-            if (!id) {
-                console.warn('popup-button directive requires attribute value to point to popup box ID attribute.');
-                return;
-            }
-            
+            var id;
+
+            $attrs.$observe(directiveName, function (val) {
+                id = val;
+            });
+
             $elem.prop('isPopupElement', true)
                 .on('click', function (e) {
                     e.preventDefault();
+
+                    if (!id) {
+                        console.warn('popupButton directive requires attribute value to point to popup box ID attribute.');
+                        return;
+                    }
                 
                     // make sure click did not come from child popup container or is disabled
                     var el = e.target,
@@ -3270,7 +3420,7 @@ module.directive('a', function () {
                             return;
 
                         // check if the button is also the popup box
-                        if (isDefined(ael.attr('data-popup-box'))) {
+                        if (ael.prop('isPopupElement')) {
                             popups.keepOpen(el.id, id);
                         }
                         el = el.parentElement;
@@ -3289,74 +3439,16 @@ module.directive('a', function () {
 /* DIRECTIVE: (<select-box>, data-select-box, .select-box)
  *
  * Provides functionality for a custom select element.
- * 
- * The basic markup for the element is as follows:
- * 
- *    <select-box data-ng-model="selectValue">
- *        <ul>
- *            <li data-value="value1">Value 1</li>
- *        </ul>
- *    </select-box>
- *    
- * 
- * The <ul> element is used as a drop down list with it's child <li> elements as list items.  
- *    
- * The 'data-value' attribute on the <li> elements specifies the item value. If it is not provided, 
- * the <li> element contents are used as the value.
- * 
- * 
- * After the directive is linked, the previous markup would become:
- * 
- *    <select-box data-ng-model="selectValue">
- *        <span class="value"></span>
- *        <span class="select-button"></span>
- *        <ul>
- *            <li data-value="value1">Value 1</li>
- *        </ul>
- *    </select-box>
- *    
- * 
- * The '.value' and '.select-button' are prepended to the select box. For the '.value' element,
- * the directive first checks if one is already provided before adding one.
- * 
- * The '.value' element is used to show the display text of the currently selected value, which is 
- * the contents of the <li> element that is selected.
- * 
- * You can customize how the value displayed by providing the '.value' element in advance:
- * 
- *    <select-box data-ng-model="selectValue">
- *        <div class="my-select-display">
- *            <span class="value"></span> is Selected.
- *        </div>
- *        <ul>
- *            <li data-value="value1">Value 1</li>
- *        </ul>
- *    </select-box>
- *    
- * 
- * Although a toggle button is provided, the entire select box acts as a toggle button, minus the 
- * dropdown. The button span is provided so a familiar select button can be rendered if desired.
- * 
- * When a value is selected, the 'data-selected' attribute is added to the corresponding <li> element 
- * and removed from the rest.
- * 
- * When a value is selected, the '.has-value' class is added to the select box element.
- * 
- * When the user clicks the select box, the open state is toggled by adding or removing the '.open' 
- * class to the select box element. The '.open' class is removed if the user clicks outside of the
- * select box.
- * 
- * If the '.disabled' class is added to the select box element, the select box will not open when clicked.
- * 
- * The ng-model attribute is required.
  */
 (function () {
 
+    var directiveName = ruiDirectiveName('selectBox');
+
     document.registerElement && document.registerElement('select-box');
 
-    module.directive('selectBox', SelectBoxDirective);
+    module.directive(directiveName, SelectBoxDirective);
 
-    SelectBoxDirective.$inject = ['$parse', 'rawUI.utils', 'rawUI.inputControls'];
+    SelectBoxDirective.$inject = ['$parse', ruiServiceName('utils'), ruiServiceName('inputControls')];
 
     /* directive */
     function SelectBoxDirective($parse, utils, controls) {
@@ -3538,80 +3630,17 @@ module.directive('a', function () {
 
 /* DIRECTIVE: (<slider-box>, data-slider-box, .slider-box)
  * 
- * A custom slider control element for changin numberical values
- * 
- * The basic markup for the element is as follows:
- * 
- *    <slider-box data-ng-model="data.value"></slider-box>
- *    
- * After the directive is linked, the previous markup would become:
- * 
- *    <slider-box data-ng-model="data.value">
- *        <div class="slider-box-track-container">
- *            <div class="slider-box-track">
- *                <div class="slider-box-handle"></div>
- *            </div>
- *        </div>
- *    </slider-box>
- *    
- * The addition elements are appended to the slider box, allowing you to add other elements 
- * inside.
- * 
- * The '.slider-box-handle' element can be dragged by the user across the '.slider-box-track'
- * element. This is accomplished by setting the css 'left' or 'top' property 
- * of the handle, depending on orientation.
- * 
- * The orientation is determine by the track size. If the track is wider than tall, the slider
- * is horizontal, otherwise it is vertical.
- * 
- * For setting active state functionality, the directive will look for an optional child element
- * with the class '.slider-box-edit-button'. If it's found, clicking on it will cause the '.active'
- * class to be added to the slider box. Clicking outside the box or completing a handle drag will 
- * cause the '.active' class to be removed.
- * 
- * If the class '.disabled' is present on the slider box element, the slider will cease 
- * functionality until the class is removed.
- * 
- * Additional Attributes:
- * The following additional attributes can be added to the slider box element to configure it.
- *     data-min - default 0, sets the minimum value.
- *     data-max - default 100, set the maximum value.
- *     data-step - default 1, set the step between values.
- *     
- * Multiple handles can be added by pre-specifying them:
- * 
- *    <slider-box>
- *        <slider-box-handle ng-model="data.value1"></slider-box-handle>
- *        <slider-box-handle ng-model="data.value2"></slider-box-handle>
- *    </slider-box>
- *    
- * The handles are automatically placed into the slider track once it is appended by the directive.
- * 
- * Note that when specifying data model for a handle, the slider box element does not require a model.
- * 
- * For multiple handles, the slider box element value is an array of handle values as well as the slider box's
- * ng model (if specified).
- * 
- * 1 or more ribbons can also be specified:
- * 
- *    <slider-box>
- *        <slider-box-handle ng-model="data.value"></slider-box-handle>
- *        <slider-box-ribbon anchor1="0" anchor2="{{data.value}}"></slider-box-ribbon>
- *    </slider-box>
- *    
- * Ribbons are automatically placed into the slider track once it is appended by the directive.
- * 
- * The size of anchor1 value relative to anchor2 value is unimportant. The smaller value is always
- * position before the larger value.
- * 
+ * A custom slider control element for changing numerical values.
  */
 (function () {
 
+    var directiveName = ruiDirectiveName('sliderBox');
+
     document.registerElement && document.registerElement('slider-box');
 
-    module.directive('sliderBox', SliderBoxDirective);
+    module.directive(directiveName, SliderBoxDirective);
 
-    SliderBoxDirective.$inject = ['$compile', 'rawUI.utils', 'rawUI.inputControls'];
+    SliderBoxDirective.$inject = ['$compile', ruiServiceName('utils'), ruiServiceName('inputControls')];
 
     /* directive */
     function SliderBoxDirective($compile, utils, controls) {
@@ -3946,11 +3975,13 @@ module.directive('a', function () {
  */
 (function () {
 
+    var directiveName = ruiDirectiveName('sliderBoxHandle');
+
     document.registerElement && document.registerElement('slider-box-handle');
 
-    module.directive('sliderBoxHandle', SliderBoxHandleDirective);
+    module.directive(directiveName, SliderBoxHandleDirective);
 
-    SliderBoxHandleDirective.$inject = ['rawUI.utils'];
+    SliderBoxHandleDirective.$inject = [ruiServiceName('utils')];
 
     /* directive */
     function SliderBoxHandleDirective(utils) {
@@ -4235,11 +4266,13 @@ module.directive('a', function () {
  */
 (function () {
 
+    var directiveName = ruiDirectiveName('sliderBoxRibbon');
+
     document.registerElement && document.registerElement('slider-box-ribbon');
 
-    module.directive('sliderBoxRibbon', SliderBoxRibbonDirective);
+    module.directive(directiveName, SliderBoxRibbonDirective);
 
-    SliderBoxRibbonDirective.$inject = ['rawUI.utils'];
+    SliderBoxRibbonDirective.$inject = [ruiServiceName('utils')];
 
     /* directive */
     function SliderBoxRibbonDirective(utils) {
@@ -4347,9 +4380,9 @@ module.directive('a', function () {
  * TabularContext data class.
  */
 (function () {
-    module.factory('rawUI.TabularContext', TabularContextFactory);
+    module.factory(ruiFactoryName('TabularContext'), TabularContextFactory);
 
-    TabularContextFactory.$inject = ['rawUI.utils'];
+    TabularContextFactory.$inject = [ruiServiceName('utils')];
 
     /* factory */
     function TabularContextFactory(utils) {
@@ -4526,7 +4559,7 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.factory('rawUI.TabularFilter', TabularFilterFactory);
+    module.factory(ruiFactoryName('TabularFilter'), TabularFilterFactory);
 
     /* factory */
     function TabularFilterFactory() {
@@ -4616,9 +4649,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.service('rawUI.tabularContexts', TabularContextsService);
+    module.service(ruiServiceName('tabularContexts'), TabularContextsService);
 
-    TabularContextsService.$inject = ['rawUI.TabularContext'];
+    TabularContextsService.$inject = [ruiFactoryName('TabularContext')];
 
     /* service */
     function TabularContextsService(TabularContext) {
@@ -4662,9 +4695,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('tabularContext', TabularContextDirective);
+    var directiveName = ruiDirectiveName('tabularContext');
 
-    TabularContextDirective.$inject = ['rawUI.utils', 'rawUI.tabularContexts'];
+    module.directive(directiveName, TabularContextDirective);
+
+    TabularContextDirective.$inject = [ruiServiceName('utils'), ruiServiceName('tabularContexts')];
 
     function TabularContextDirective(utils, contexts) {
 
@@ -4679,132 +4714,15 @@ module.directive('a', function () {
 
         /* controller */
         function tabularContextController($attrs) {
-            utils.wrap(contexts.getContext($attrs.tabularContext), this);
+            utils.wrap(contexts.getContext($attrs[directiveName]), this);
         }
 
         /* link */
         function tabularContextLink($scope, $elem, $attrs) {
 
-            if (!$attrs.tabularContext) {
+            if (!$attrs[directiveName]) {
                 console.warn('tabularContext directive requires a context name attribute value.')
             }
-        }
-    }
-}());
-
-
-/* SERVICE: sorting
- * 
- * Array sorting service
- */
-(function () {
-
-    module.service('rawUI.Sorting', SortingService);
-
-    /* service */
-    function SortingService() {
-
-        var _service = this,
-            _sorters = {};
-
-        this.addSorter = function (name, func) {
-            _sorters[name] = func;
-            return _service;
-        };
-
-        this.sort = function (array, sorterName) {
-            var sorter = _sorters[sorterName];
-            if (!sorter)
-                throw 'Sorter named "' + sorterName + '" not found.';
-
-            array.sort(sorter);
-        };
-
-        this.sortBy = function (array, propName, isAscending) {
-            array.sort(function (a, b) {
-                if (a[propName] > b[propName]) return isAscending ? 1 : -1;
-                if (a[propName] < b[propName]) return isAscending ? -1 : 1;
-                return 0;
-            });
-        };
-    }
-}());
-
-
-/* DIRECTIVE: (data-sort-by)
- *
- * A table header button that changes the tabular context sorting when pressed.
- * 
- * The attribute value is the sort name. How the name is used depends on how the 
- * controller that renders data is written.
- * 
- * When pressed, the sorting state will toggle between ascending and descending.
- * 
- * When the sorting state is ascending, the '.sort-ascending' class is added to the element,
- * when descending, the '.sort-descending' class is added.
- * 
- * If another 'sort by' button in the same tabular context is pressed, if its sort name is
- * different, the sorting state for this button becomes 'none' and all sort classes are 
- * removed.
- * 
- * In order to set the tabular context of the button, the button must be a child element
- * of the (data-tabular-context) directive.
- */
-(function () {
-
-    module.directive('sortBy', SortByDirective);
-
-    SortByDirective.$inject = ['rawUI.utils'];
-
-    /* directive */
-    function SortByDirective(utils) {
-
-        /* return */
-        return {
-            restrict: 'A',
-            scope: true,
-            require: '^tabularContext',
-            link: sortByLink
-        };
-
-        /* link */
-        function sortByLink($scope, $elem, $attrs, context) {
-
-            var sortName = $attrs.sortBy;
-            if (!sortName) {
-                console.warn('sortBy directive requires an attribute value.');
-                return;
-            }
-
-            $elem.on('click', function (e) {
-                e.preventDefault();
-
-                if (utils.isDisabled($elem) || context.isWaiting)
-                    return;
-
-                var isAscending = context.isSortAscend;
-
-                if (context.sortName === sortName) {
-                    isAscending = !isAscending;
-                } else {
-                    isAscending = true;
-                }
-
-                context.sortName = sortName;
-                context.isSortAscend = isAscending;
-            });
-
-            $scope.$watch(function () {
-                return context.sortName + context.isSortAscend;
-            }, function () {
-                if (context.sortName !== sortName) {
-                    $elem.removeClass('sort-ascending sort-descending');
-                } else if (context.isSortAscend) {
-                    $elem.removeClass('sort-descending').addClass('sort-ascending');
-                } else {
-                    $elem.removeClass('sort-ascending').addClass('sort-descending');
-                }
-            });
         }
     }
 }());
@@ -4816,9 +4734,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.factory('rawUI.Pagination', PaginationFactory);
+    module.factory(ruiFactoryName('Pagination'), PaginationFactory);
 
-    PaginationFactory.$inject = ['rawUI.utils'];
+    PaginationFactory.$inject = [ruiServiceName('utils')];
 
     /* factory */
     function PaginationFactory(utils) {
@@ -4905,17 +4823,15 @@ module.directive('a', function () {
 
 /* DIRECTIVE: (data-pagination)
  *
- * Creates a tabular context for all child directives that require a tabular context.
- * 
- * Attribute value is used to specify tabular context name. If the directive is a child of the
- * (data-tabular-context) directive, then the context is already provided and attribtue value is 
- * not needed.
+ * Pagination directives container and controller.
  */
 (function () {
 
-    module.directive('pagination', PaginationDirective);
+    var directiveName = ruiDirectiveName('paginationBox');
 
-    PaginationDirective.$inject = ['rawUI.utils', 'rawUI.tabularContexts', 'rawUI.Pagination'];
+    module.directive(directiveName, PaginationDirective);
+
+    PaginationDirective.$inject = [ruiServiceName('utils'), ruiServiceName('tabularContexts'), ruiFactoryName('Pagination')];
 
     /* directive */
     function PaginationDirective(utils, contexts, Pagination) {
@@ -4932,7 +4848,7 @@ module.directive('a', function () {
 
         /* controller */
         function paginationController($scope, $attrs) {
-            var context = $scope.tabularContext || contexts.getContext($attrs.pagination),
+            var context = $scope.tabularContext || contexts.getContext($attrs[directiveName]),
                 pagin = context.pagination || (context.pagination = new Pagination(context));
 
             // wrap pagination instance with controller
@@ -4966,7 +4882,7 @@ module.directive('a', function () {
         /* link */
         function paginationLink($scope, $elem, $attrs, context) {
 
-            if (!context && !$attrs.pagination)
+            if (!context && !$attrs[directiveName])
                 throw 'Tabular context required for pagination.';
         }
     }
@@ -4979,9 +4895,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('paginationNext', PaginationNextDirective);
+    var directiveName = ruiDirectiveName('paginationNext');
 
-    PaginationNextDirective.$inject = ['rawUI.utils'];
+    module.directive(directiveName, PaginationNextDirective);
+
+    PaginationNextDirective.$inject = [ruiServiceName('utils')];
 
     /* directive */
     function PaginationNextDirective(utils) {
@@ -4990,7 +4908,7 @@ module.directive('a', function () {
         return {
             restrict: 'EAC',
             scope: true,
-            require: '^pagination',
+            require: '^paginationBox',
             link: paginationNextLink
         };
 
@@ -5020,9 +4938,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('paginationPrev', PaginationPrevDirective);
+    var directiveName = ruiDirectiveName('paginationPrev');
 
-    PaginationPrevDirective.$inject = ['rawUI.utils'];
+    module.directive(directiveName, PaginationPrevDirective);
+
+    PaginationPrevDirective.$inject = [ruiServiceName('utils')];
 
     function PaginationPrevDirective(utils) {
 
@@ -5030,7 +4950,7 @@ module.directive('a', function () {
         return {
             restrict: 'EAC',
             scope: true,
-            require: '^pagination',
+            require: '^paginationBox',
             link: paginationPrevLink
         };
 
@@ -5060,9 +4980,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('paginationPage', PaginationPageDirective);
+    var directiveName = ruiDirectiveName('paginationPage');
 
-    PaginationPageDirective.$inject = ['rawUI.utils'];
+    module.directive(directiveName, PaginationPageDirective);
+
+    PaginationPageDirective.$inject = [ruiServiceName('utils')];
 
     /* directive */
     function PaginationPageDirective(utils) {
@@ -5071,12 +4993,18 @@ module.directive('a', function () {
         return {
             restrict: 'A',
             scope: true,
-            require: '^pagination',
+            require: '^paginationBox',
             link: paginationPageLink
         };
 
         /* link */
-        function paginationPageLink($scope, $elem, attrs, pagin) {
+        function paginationPageLink($scope, $elem, $attrs, pagin) {
+
+            var page;
+
+            $attrs.$observe(directiveName, function (val) {
+                page = utils.parseInt(val, 1);
+            });
 
             $elem.on('click', function (e) {
                 e.preventDefault();
@@ -5084,12 +5012,10 @@ module.directive('a', function () {
                 if (utils.isDisabled($elem) || pagin.context.isWaiting)
                     return;
 
-                pagin.page = utils.parseInt(attrs.paginationPage, 1);
+                pagin.page = page;
             });
 
             $scope.$watch('pagination.changes', function () {
-                var page = utils.parseInt(attrs.paginationPage, 1);
-
                 $elem.toggleClass('active', pagin.page === page);
                 $elem.toggleClass('disabled', page < 1 || page > pagin.total);
             });
@@ -5104,9 +5030,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('paginationPager', PaginationPagerDirective);
+    var directiveName = ruiDirectiveName('paginationPager');
 
-    PaginationPagerDirective.$inject = ['rawUI.utils'];
+    module.directive(directiveName, PaginationPagerDirective);
+
+    PaginationPagerDirective.$inject = [ruiServiceName('utils')];
 
     /* directive */
     function PaginationPagerDirective(utils) {
@@ -5115,7 +5043,7 @@ module.directive('a', function () {
         return {
             restrict: 'A',
             scope: true,
-            require: '^pagination',
+            require: '^paginationBox',
             controller: ['$scope', '$attrs', paginationPagerController],
             controllerAs: 'pager',
             link: paginationPagerLink
@@ -5123,11 +5051,11 @@ module.directive('a', function () {
 
         /* controller */
         function paginationPagerController($scope, $attrs) {
-            var vm = this,
+            var ctrl = this,
                 pages = [],
                 total = 1,
                 segment = 1,
-                maxPages = utils.parseInt($attrs.paginationPager, 5),
+                maxPages,
                 changes = 0;
 
             this.updatePages = updatePages;
@@ -5174,7 +5102,7 @@ module.directive('a', function () {
             });
 
             /**
-             * Get the current visible page segment index.
+             * Get or set the current visible page segment index.
              */
             defineProperty(this, 'segment', {
                 get: function () {
@@ -5206,6 +5134,11 @@ module.directive('a', function () {
                 enumerable: true
             });
 
+            $attrs.$observe(directiveName, function (val) {
+                maxPages = utils.parseInt(val, 5);
+                ctrl.updatePages();
+            });
+
             function updatePages() {
                 pages = [];
 
@@ -5219,7 +5152,7 @@ module.directive('a', function () {
 
             function change() {
                 changes++;
-                vm.updatePages();
+                ctrl.updatePages();
                 utils.triggerUpdate();
             }
 
@@ -5265,9 +5198,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('paginationPagerNext', PaginationPagerNextDirective);
+    var directiveName = ruiDirectiveName('paginationPagerNext');
 
-    PaginationPagerNextDirective.$inject = ['rawUI.utils'];
+    module.directive(directiveName, PaginationPagerNextDirective);
+
+    PaginationPagerNextDirective.$inject = [ruiServiceName('utils')];
 
     /* directive */
     function PaginationPagerNextDirective(utils) {
@@ -5314,9 +5249,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('paginationPagerPrev', PaginationPagerPrevDirective);
+    var directiveName = ruiDirectiveName('paginationPagerPrev');
 
-    PaginationPagerPrevDirective.$inject = ['rawUI.utils'];
+    module.directive(directiveName, PaginationPagerPrevDirective);
+
+    PaginationPagerPrevDirective.$inject = [ruiServiceName('utils')];
 
     function PaginationPagerPrevDirective(utils) {
 
@@ -5355,15 +5292,120 @@ module.directive('a', function () {
 }());
 
 
+/* SERVICE: sorting
+ * 
+ * Array sorting service
+ */
+(function () {
+
+    module.service(ruiServiceName('sorting'), SortingService);
+
+    /* service */
+    function SortingService() {
+
+        var _service = this,
+            _sorters = {};
+
+        this.addSorter = function (name, func) {
+            _sorters[name] = func;
+            return _service;
+        };
+
+        this.sort = function (array, sorterName) {
+            var sorter = _sorters[sorterName];
+            if (!sorter)
+                throw 'Sorter named "' + sorterName + '" not found.';
+
+            array.sort(sorter);
+        };
+
+        this.sortBy = function (array, propName, isAscending) {
+            array.sort(function (a, b) {
+                if (a[propName] > b[propName]) return isAscending ? 1 : -1;
+                if (a[propName] < b[propName]) return isAscending ? -1 : 1;
+                return 0;
+            });
+        };
+    }
+}());
+
+
+/* DIRECTIVE: (data-sort-by)
+ *
+ * A table header button that changes the tabular context sorting when pressed.
+ */
+(function () {
+
+    var directiveName = ruiDirectiveName('sortBy');
+
+    module.directive(directiveName, SortByDirective);
+
+    SortByDirective.$inject = [ruiServiceName('utils')];
+
+    /* directive */
+    function SortByDirective(utils) {
+
+        /* return */
+        return {
+            restrict: 'A',
+            scope: true,
+            require: '^tabularContext',
+            link: sortByLink
+        };
+
+        /* link */
+        function sortByLink($scope, $elem, $attrs, context) {
+
+            var sortName;
+
+            $attrs.$observe(directiveName, function (val) {
+                sortName = val;
+                !sortName && console.warn('sortBy directive requires an attribute value.');
+            });
+
+            $elem.on('click', function (e) {
+                e.preventDefault();
+
+                if (utils.isDisabled($elem) || context.isWaiting)
+                    return;
+
+                var isAscending = context.isSortAscend;
+
+                if (context.sortName === sortName) {
+                    isAscending = !isAscending;
+                } else {
+                    isAscending = true;
+                }
+
+                context.sortName = sortName;
+                context.isSortAscend = isAscending;
+            });
+
+            $scope.$watch(function () {
+                return context.sortName + context.isSortAscend;
+            }, function () {
+                if (context.sortName !== sortName) {
+                    $elem.removeClass('sort-ascending sort-descending');
+                } else if (context.isSortAscend) {
+                    $elem.removeClass('sort-descending').addClass('sort-ascending');
+                } else {
+                    $elem.removeClass('sort-ascending').addClass('sort-descending');
+                }
+            });
+        }
+    }
+}());
+
+
 /* SERVICE: validation
  *
  * Form input validation services.
  */
 (function () {
 
-    module.service('rawUI.validation', ValidationService);
+    module.service(ruiServiceName('validation'), ValidationService);
 
-    ValidationService.$inject = ['rawUI.utils', 'rawUI.inputControls'];
+    ValidationService.$inject = [ruiServiceName('utils'), ruiServiceName('inputControls')];
 
     /* service */
     function ValidationService(utils, controls) {
@@ -5503,7 +5545,12 @@ module.directive('a', function () {
         function register(elem, handlerNames, context, callback, id) {
             elem = utils.getNgElem(elem);
             totalRegistered++;
-            id = id || elem.attr('id') || 'input' + totalRegistered;
+            id = (function () {
+                if (id) return id;
+                if (elem.attr('type') === 'radio')
+                    return elem.attr('name') || 'input' + totalRegistered;
+                return elem.attr('id') || 'input' + totalRegistered;
+            }());
 
             var reg = registered[id];
             if (reg) {
@@ -5638,7 +5685,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('validateContext', ValidateContextDirective);
+    var directiveName = ruiDirectiveName('validateContext');
+
+    module.directive(directiveName, ValidateContextDirective);
 
     /* directive */
     function ValidateContextDirective() {
@@ -5652,11 +5701,13 @@ module.directive('a', function () {
 
         /* link */
         function validateContextLink($scope, $elem, $attrs) {
-            if (!$attrs.validateContext) {
-                console.warn('validate-context directive requires attribute value to set context name.');
-                return;
-            }
-            $scope.validationContext = $attrs.validateContext;
+
+            $attrs.$observe(directiveName, function (val) {
+
+                $scope.validationContext = val;
+
+                !val && console.warn('validateContext directive requires attribute value to set context name.');
+            });
         }
     }
 }());
@@ -5670,9 +5721,11 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('validate', ValidateDirective);
+    var directiveName = ruiDirectiveName('validate');
 
-    ValidateDirective.$inject = ['rawUI.validation', 'rawUI.inputControls'];
+    module.directive(directiveName, ValidateDirective);
+
+    ValidateDirective.$inject = [ruiServiceName('validation'), ruiServiceName('inputControls')];
 
     /* directive */
     function ValidateDirective(validation, controls) {
@@ -5686,21 +5739,14 @@ module.directive('a', function () {
 
         /* link */
         function validateLink($scope, $elem, $attrs) {
-            var handlers = $attrs.validate || 'required',
-
+            var handlers, id,
                 // input element
-                input = controls.findControl($elem),
+                input = controls.findControl($elem);
 
-                // validation result callback
-                resultCallback = function (isValid, failedFor) {
-                    $scope.isValid = isValid;
-                    $scope.failedFor = failedFor;
-                    $elem.toggleClass('invalid', !isValid);
-                },
-
-                // registered ID
-                id = validation.register(input, handlers,
-                    $scope.validateContext || $attrs.validateContext, resultCallback, input.attr('name'));
+            $attrs.$observe(directiveName, function (val) {
+                handlers = val || 'required';
+                id = register();
+            });
 
             // setup scope
             $scope.isValid = true;
@@ -5710,20 +5756,20 @@ module.directive('a', function () {
                 validation.unregister(id);
             });
 
-            // realtime validation
+            // real time validation
             $scope.$watch(function () {
                 return controls.getValue(input);
             }, function () {
-                // only do realtime validation if already invalid
+                // only do real time validation if already invalid
                 !$scope.isValid && validation.validate(id);
             });
 
             if (input[0].tagName === 'TEXTAREA') {
 
-                // realtime validation for textarea
+                // real time validation for <textarea>
                 input.on('keydown', function () {
 
-                    // only do realtime validation if already invalid
+                    // only do real time validation if already invalid
                     !$scope.isValid && validation.validate(id);
                 });
             } else if (input.attr('type') === 'checkbox') {
@@ -5739,6 +5785,22 @@ module.directive('a', function () {
                     validation.validate(id);
                 });
             }
+
+            // validation result callback
+            function resultCallback (isValid, failedFor) {
+                $scope.isValid = isValid;
+                $scope.failedFor = failedFor;
+                $elem.toggleClass('invalid', !isValid);
+            }
+
+            function register() {
+                if (id) {
+                    validation.unregister(id);
+                }
+                return validation.register(input, handlers,
+                    $scope.validateContext || $attrs[ruiDirectiveName('validateContext')],
+                    resultCallback, input.attr('name'))
+            }
         }
     }
 }());
@@ -5753,7 +5815,9 @@ module.directive('a', function () {
  */
 (function () {
 
-    module.directive('noValidate', NoValidateDirective);
+    var directiveName = ruiDirectiveName('noValidate');
+
+    module.directive(directiveName, NoValidateDirective);
 
     NoValidateDirective.$inject = ['$parse'];
 
@@ -5769,7 +5833,14 @@ module.directive('a', function () {
 
         /* link */
         function noValidateLink($scope, $elem, $attrs) {
-            var getter = $parse($attrs.noValidate);
+
+            var attrVal = $attrs[directiveName];
+            if (!attrVal) {
+                console.warn('noValidate directive requires an expression to evaluate.');
+                return;
+            }
+
+            var getter = $parse(attrVal);
 
             $scope.$watch(function () {
                 return getter($scope);

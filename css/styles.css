@@ -905,10 +905,14 @@ a.icon {
 .select-box .value,
 .select-box .title {
   display: inline-block;
-  -webkit-transition: 0.3s ease opacity;
-  transition: 0.3s ease opacity;
   vertical-align: middle;
   line-height: 37px;
+  -webkit-transition: 0.3s ease opacity;
+  transition: 0.3s ease opacity;
+}
+
+.select-box .title {
+  color: #a7a7a7;
 }
 
 .select-box .value {
@@ -934,8 +938,7 @@ a.icon {
   height: 12px;
   text-indent: -9000px;
   z-index: 5;
-  background: url("../img/sprite.png") no-repeat top left;
-  background-position: 0 -13px;
+  background: url("../img/sprite.png") no-repeat 0 -13px;
 }
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
@@ -946,8 +949,6 @@ a.icon {
 }
 
 .select-box > ul {
-  -webkit-transition: 0.25s ease opacity, 0.3s ease background-color;
-  transition: 0.25s ease opacity, 0.3s ease background-color;
   display: block;
   position: absolute;
   left: -1px;
@@ -956,14 +957,16 @@ a.icon {
   height: 0;
   max-height: 275px;
   min-width: 100%;
-  background: #333333;
-  overflow: auto;
-  overflow-x: hidden;
+  text-shadow: none;
+  background: #b7b7b7;
+  overflow: hidden;
   z-index: 500000;
   cursor: default;
   border: 1px solid #101010;
   border-top: none;
   opacity: 0;
+  -webkit-transition: 0.25s ease opacity, 0.25s ease height;
+  transition: 0.25s ease opacity, 0.25s ease height;
 }
 
 @media (min-width: 992px) {
@@ -1037,13 +1040,15 @@ a.icon {
 }
 
 .select-box.open {
-  text-shadow: none;
-  background: #b7b7b7;
   border-bottom: none;
 }
 
 .select-box.open .display {
+  text-shadow: none;
   background: #b7b7b7;
+}
+
+.select-box.open .title {
   color: #000;
 }
 
@@ -1057,12 +1062,21 @@ a.icon {
   background: #c5c5c5;
   height: auto;
   opacity: 1;
+  overflow-y: auto;
+}
+
+.select-box.open > ul.opening {
+  overflow-y: hidden;
 }
 
 .select-box.open .select-button {
   background-position: 0 0;
   -ms-transform: rotate(180deg);
   transform: rotate(180deg);
+}
+
+.select-box.closing > ul {
+  overflow-y: hidden !important;
 }
 
 /***** Slider */
@@ -1169,7 +1183,7 @@ a.icon {
   cursor: pointer;
 }
 
-.slider-box .slider-box-handle {
+.slider-box slider-box-handle {
   position: absolute;
   left: 0;
   top: 50%;

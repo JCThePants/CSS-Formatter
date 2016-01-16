@@ -3,7 +3,7 @@ require.config({
     paths: {
         'requireLib': 'libs/require.min',
         'angular': 'libs/angular.min',
-        'css-format': 'libs/css-format',
+        'css-format': 'libs/css-format.min',
         'rawUI': 'libs/raw-ui.min'
     },
     shim: {

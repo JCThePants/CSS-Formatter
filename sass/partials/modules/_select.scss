@@ -167,7 +167,7 @@
       color: #000;
     }
     .value {
-      opacity: 0;
+      opacity: 0 !important;
     }
     & > ul {
       display: inline-block;

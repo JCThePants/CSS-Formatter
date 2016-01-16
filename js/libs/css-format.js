@@ -29,13 +29,13 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 }]);
 
 
- module.factory('CSSFormatter', ['CSSLine', 'CSSComment', 'CSSParentSelector', 'CSSProperty', 'CSSSelectors', 'CSSUtils', 
-                                    function (CSSLine, CSSComment, CSSParentSelector, CSSProperty, CSSSelectors, CSSUtils) {
+module.factory('CSSFormatter', ['CSSLine', 'CSSComment', 'CSSParentSelector', 'CSSProperty', 'CSSSelectors', 'CSSUtils', 'cssNestedIndenter',
+    function (CSSLine, CSSComment, CSSParentSelector, CSSProperty, CSSSelectors, CSSUtils, nestedIndenter) {
 
         /**
          * Generates formatted CSS in objects each representing a single
          * line in the output stylesheet.
-         * 
+         *
          * @param {CSSParser} parser        The CSS Parser to use.
          * @param {object}    [options={}]  Optional configuration. See defaultOptions function source for documentation.
          */
@@ -49,7 +49,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Get a new object filled with default options.
-         * 
+         *
          * @returns {object}
          */
         CSSFormatter.defaultOptions = function () {
@@ -63,7 +63,8 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
                     forcePerLine: false,        // if true, always writes multi selectors each on a new line
                     combinatedPerLine: true,    // if true, combined selectors in multi selectors are each on their own line
                     linesBeforeMulti: 0,        // extra lines to before multi selectors, if less than linesBefore, linesBefore is used.
-                    multispace: 1               // spaces between individual selectors in multi selectors,
+                    multispace: 1,              // spaces between individual selectors in multi selectors,
+                    nestedIndent: 0             // nested indent based on selector specificity
                 },
                 braces: {
                     openNewLine: false,         // If true, the opening brace is placed on a new line,
@@ -71,13 +72,13 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
                     openIndentAfter: 0,         // The number of spaces after an opening brace.
                     closeNewLine: true,         // If true, the closing brace is placed on a new line
                     closeIndent: 0,             // The number of spaces before a closing brace.
-                    closeIndentAfter: 0,        // The number of spaces after a clsoing brace.
+                    closeIndentAfter: 0         // The number of spaces after a clsoing brace.
                 },
                 property: {
                     newLine: true,              // True to place properties each on its own line
                     spaceBetween: 1,            // the number of spaces between the property and its value;
                     closeLast: true,            // if true, adds a semicolon at the end of the last property
-                    indentAfter: 0,             // the number of spaces after a property
+                    indentAfter: 0              // the number of spaces after a property
                 },
                 comments: {
                     render: true,               // true to render comments
@@ -92,7 +93,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Get a new object filled with default options.
-         * 
+         *
          * @returns {object}
          */
         CSSFormatter.prototype.defaultOptions = function () {
@@ -101,7 +102,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Get generated lines.
-         * 
+         *
          * @returns {Array} Array of CSSLine
          */
         CSSFormatter.prototype.getLines = function () {
@@ -111,25 +112,32 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
         /**
          * Generate formatted stylesheet as line objects and optionally output
          * directly into a specified array.
-         * 
-         * @param   {Array} [outputArray] Array to output line objects into.
-         * 
+         *
          * @returns {Array} An array of generated line objects.
          */
         CSSFormatter.prototype.generateLines = function () {
             var parser = this._parser,
                 entities = parser.getSelectors(),
-                state = new CSSFormatState();
+                state = new CSSFormatState(),
+                options = this._options;
 
-            for (var i = 0, prev, entity; entity = entities[i]; i++) {
+            var indent = 0;
+
+            // apply nested indent
+            if (options.selectors.nestedIndent) {
+                nestedIndenter.indent(entities, options.selectors.nestedIndent);
+            }
+
+            for (var i = 0, prev, prevSelector, entity; entity = entities[i]; i++) {
 
                 if (entity instanceof CSSComment) {
-                    this.generateComment(entity, 0, state);
+                    this.generateComment(entity, indent, state);
                 } else if (entity instanceof CSSParentSelector) {
-                    this.generateParentSelectors(entity, prev && prev instanceof CSSComment, 0, state);
+                    this.generateParentSelectors(entity, prev && prev instanceof CSSComment, indent, state);
                 } else if (entity instanceof CSSSelectors) {
-                    this.generateSelectors(entity, prev && prev instanceof CSSComment, 0, state);
-                    this.generateProperties(entity, 0, state);
+                    this.generateSelectors(entity, prev && prev instanceof CSSComment, entity.indent, state);
+                    this.generateProperties(entity, entity.indent, state);
+                    prevSelector = entity;
                 }
 
                 prev = entity;
@@ -141,7 +149,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Format and output comment line object.
-         * 
+         *
          * @param   {CSSComment}      comment  The comment object to format.
          * @param   {number}          indent   The indent depth of the comment.
          * @param   {CSSFormatState}  state    The formatter state.
@@ -169,7 +177,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Format and output parent selector line object.
-         * 
+         *
          * @param {object}           parent          The parent CSS element.
          * @param {boolean}          isAfterComment  True if the selector is after a comment.
          * @param {number}           indent          The indent depth of the selector.
@@ -192,10 +200,10 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
                 if (child instanceof CSSComment) {
                     this.generateComment(child, indent + options.indent, state);
-                } 
+                }
                 else if (child instanceof CSSParentSelector) {
                     this.generateParentSelectors(child, prev && prev instanceof CSSComment, indent + options.indent, state);
-                } 
+                }
                 else if (child instanceof CSSSelectors) {
                     this.generateSelectors(child, prev && prev instanceof CSSComment, indent + options.indent, state);
                     this.generateProperties(child, indent + options.indent, state);
@@ -209,9 +217,9 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Format and output selectors and opening brace.
-         * 
+         *
          * @param   {CSSSelectors}    selectors       The selectors object to format.
-         * @param   {true|false}      isAfterComment  True if the comment proceeds a comment, otherwise false.
+         * @param   {boolean}         isAfterComment  True if the comment proceeds a comment, otherwise false.
          * @param   {number}          indent          The number of indents to add before the selector.
          * @param   {CSSFormatState}  state           The formatter state.
          */
@@ -219,9 +227,14 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
             var options = this._options,
                 sopts = options.selectors;
 
+            // add selector comments
+            for (var j=0; j < selectors.comments.length; j++) {
+                this.generateComment(selectors.comments[j], indent, state);
+            }
+
             options.selectors.newLine && state.hasLines() && state.newLine(indent);
 
-            this.generateLinesBeforeSelector(state, indent, selectors, isAfterComment);
+            this.generateLinesBeforeSelector(state, indent, selectors, isAfterComment || selectors.comments.length);
 
             // get and add comma if the current context calls for one
             function comma(index, output) {
@@ -234,6 +247,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
             for (var i = 0, last = selectors.selectors.length - 1, sel; sel = selectors.selectors[i]; i++) {
 
                 var text = [sel];
+                sel.indent = indent;
                 comma(i, text);
 
                 var newLine = (function () {
@@ -244,12 +258,12 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
                         return i !== last;
 
                     if (sopts.combinatedPerLine && sel.hasCombinator()) {
-                        
+
                         if (state.current.text().length !== 0 && i !== 0) {
                             // put on own line if not on new line from previous selector
                             state.newLine(indent);
                         }
-                        
+
                         return i !== last;
                     }
 
@@ -272,7 +286,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Format and output properties and closing brace.
-         * 
+         *
          * @param {CSSSelectors}    selectors    The selectors whose properties are to be formatted.
          * @param {number}          indent       The indent depth of the comment.
          * @param {CSSFormatState}  state        The formatter state.
@@ -293,7 +307,6 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
                         state.current.push([CSSUtils.spaceChar, prop]);
                     }
-                    continue;
                 } else if (prop instanceof CSSProperty) {
 
                     popts.newLine && state.newLine(indent + options.indent);
@@ -324,7 +337,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Generate opening brace.
-         * 
+         *
          * @param {CSSFormatState}   state   The formatter state.
          * @param {number}           indent  The current indent.
          */
@@ -340,7 +353,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Generate closing brace.
-         * 
+         *
          * @param {CSSFormatState}   state   The formatter state.
          * @param {number}           indent  The current indent.
          */
@@ -356,7 +369,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Generate empty lines before selector.
-         * 
+         *
          * @param   {CSSFormatState}  state           The formatter state.
          * @param   {number}          indent          The current indent.
          * @param   {CSSSelectors}    selectors       The selectors the lines are before.
@@ -387,7 +400,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Add empty lines
-         * 
+         *
          * @param   {number}          total   The number of lines.
          * @param   {number}          indent  The current indent.
          * @param   {CSSFormatState}  state   The generator state.
@@ -401,7 +414,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Get generated stylesheet as a string.
-         * 
+         *
          * @returns {string}
          */
         CSSFormatter.prototype.toString = function () {
@@ -427,7 +440,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         /**
          * Create a new line using the specified indent.
-         * 
+         *
          * @param {number} indent  The number of spaces to indent the new line with.
          */
         CSSFormatState.prototype.newLine = function (indent) {
@@ -438,7 +451,7 @@ module.factory('CSSComment', ['CSSUtils', function (CSSUtils) {
 
         return CSSFormatter;
 
-}]);
+    }]);
 
 
 module.factory('CSSLine', [function () {
@@ -605,14 +618,23 @@ module.factory('CSSParser', ['CSSComment', 'CSSParentSelector', 'CSSProperty', '
             mode = 'none', // parse-selector, parse-property, parse-value
             currSelectors = null,
             currProperty = null,
-            prevProperty = null;
+            prevProperty = null,
+            selectorComments = [];
+
 
         if (!state.css)
             return;
 
         // push current selectors into array and reset
         function pushSelectors() {
-            currSelectors && selectors.push(currSelectors);
+            if (currSelectors) {
+                selectors.push(currSelectors);
+
+                if (selectorComments.length) {
+                    currSelectors.comments = selectorComments;
+                    selectorComments = [];
+                }
+            }
             currSelectors = null;
             mode = 'none';
         }
@@ -638,7 +660,7 @@ module.factory('CSSParser', ['CSSComment', 'CSSParentSelector', 'CSSProperty', '
 
                 // selector comment
                 if (mode == 'none') {
-                    selectors.push(this.parseComment(state, 'selector'));
+                    selectorComments.push(this.parseComment(state, 'selector'));
                 }
                 // property comment
                 else if (hasReturn && currSelectors) {
@@ -722,8 +744,8 @@ module.factory('CSSParser', ['CSSComment', 'CSSParentSelector', 'CSSProperty', '
      * 
      * @param   {CSSParserState}  state  The parser state.
      *                              
-     * @returns {true|false}  true if return/new-line characters were found during 
-     *                        skip, otherwise false.
+     * @returns {boolean}  true if return/new-line characters were found during
+     *                     skip, otherwise false.
      */
     CSSParser.prototype.skipWhiteSpace = function (state) {
         var hasReturn = false;
@@ -1052,7 +1074,7 @@ module.factory('CSSSelector', [function () {
 
     /**
      * Single selector data object.
-     * 
+     *
      * @param {string} name  The selector name.
      */
     function CSSSelector(name) {
@@ -1061,8 +1083,8 @@ module.factory('CSSSelector', [function () {
 
     /**
      * Determine if the selector has a combinator.
-     * 
-     * @returns {true|false}
+     *
+     * @returns {boolean}
      */
     CSSSelector.prototype.hasCombinator = function () {
         return this.name.indexOf(' ') !== -1 ||
@@ -1095,7 +1117,20 @@ module.factory('CSSSelectors', ['CSSUtils', function (CSSUtils) {
         this.properties = properties || [];
         this.start = 0;
         this.end = 0;
+        this.indent = 0;
+        this.comments = [];
     }
+
+    /**
+     * Compare the specificity with another CSSSelector.
+     *
+     * @param  {CSSSelector} other The other CSSSelector to compare to.
+     *
+     * @returns {number}
+     */
+    CSSSelectors.prototype.compareSpecificity = function (other) {
+        return this.selectors[0].compareSpecificity(other.selectors[0]);
+    };
 
     /**
      * Get the selector names as a string.
@@ -1103,6 +1138,16 @@ module.factory('CSSSelectors', ['CSSUtils', function (CSSUtils) {
     CSSSelectors.prototype.toString = function () {
         return this.selectors.toString();
     };
+
+    /**
+     * Get the name of the root selector in the first selector.
+     */
+    Object.defineProperty(CSSSelectors.prototype, 'rootSelector', {
+        get: function () {
+            return this.selectors[0].rootSelector;
+        },
+        enumerable: true
+    });
 
     return CSSSelectors;
 
@@ -1435,20 +1480,24 @@ module.factory('CSSUtils', [function () {
 }]);
 
 
-module.directive('cssLines', ['CSSComment', 'CSSParentSelector', 'CSSSelector', 'CSSPropertyName', 'CSSPropertyValue', 'CSSUtils', function (CSSComment, CSSParentSelector, CSSSelector, CSSPropertyName, CSSPropertyValue, CSSUtils) {
+(function () {
 
-    var ae = angular.element;
+    module.directive('cssLines', CSSLinesDirective);
+    CSSLinesDirective.$inject = ['CSSComment', 'CSSParentSelector', 'CSSSelector', 'CSSPropertyName', 'CSSPropertyValue', 'CSSUtils'];
 
-    function nbsp(str) {
-        return str.toString().replace(/ /g, '&nbsp;');
-    }
+    function CSSLinesDirective(CSSComment, CSSParentSelector, CSSSelector, CSSPropertyName, CSSPropertyValue, CSSUtils) {
 
-    return {
-        restrict: 'A',
-        scope: {
-            lines: '=cssLines'
-        },
-        link: function (scope, elem, attrs) {
+        var ae = angular.element;
+
+        return {
+            restrict: 'A',
+            scope: {
+                lines: '=cssLines'
+            },
+            link: cssLinesLink
+        };
+
+        function cssLinesLink(scope, elem) {
 
             scope.$watch('lines', function () {
 
@@ -1458,7 +1507,7 @@ module.directive('cssLines', ['CSSComment', 'CSSParentSelector', 'CSSSelector', 
                     return;
 
                 for (var i = 0, line; line = scope.lines[i]; i++) {
-                    var div = ae('<div class="css-line"></div>')
+                    var div = ae('<div class="css-line"></div>');
                     elem.append(div);
 
                     if (line.text().length === 0) {
@@ -1471,21 +1520,7 @@ module.directive('cssLines', ['CSSComment', 'CSSParentSelector', 'CSSSelector', 
 
                     for (var j = 0, item; item = line.text()[j]; j++) {
 
-                        var className;
-                        if (item instanceof CSSComment) {
-                            className = 'css-comment ' + item.type;
-                        } else if (item instanceof CSSParentSelector) {
-                            className = 'css-selector';
-                        } else if (item instanceof CSSSelector) {
-                            className = 'css-selector';
-                        } else if (item instanceof CSSPropertyName) {
-                            className = 'css-property-name';
-                        } else if (item instanceof CSSPropertyValue) {
-                            className = 'css-property-value';
-                        } else {
-                            className = 'css-text';
-                        }
-
+                        var className = getCssClass(item);
                         if (className)
                             div.append('<span class="' + className + '">' + item + '</span>');
                         else {
@@ -1494,8 +1529,114 @@ module.directive('cssLines', ['CSSComment', 'CSSParentSelector', 'CSSSelector', 
                     }
                 }
             });
+        }
 
+        function getCssClass(item) {
+            if (item instanceof CSSComment) {
+                return 'css-comment ' + item.type;
+            } else if (item instanceof CSSParentSelector) {
+                return 'css-selector';
+            } else if (item instanceof CSSSelector) {
+                return 'css-selector';
+            } else if (item instanceof CSSPropertyName) {
+                return 'css-property-name';
+            } else if (item instanceof CSSPropertyValue) {
+                return 'css-property-value';
+            } else {
+                return 'css-text';
+            }
+        }
+
+        function nbsp(str) {
+            return str.toString().replace(/ /g, '&nbsp;');
+        }
+    }
+}());
+
+
+module.service('cssNestedIndenter', ['CSSSelectors', function (CSSSelectors) {
+
+    /**
+     * Modify indent on CSSSelector instances to reflect parent child relationships.
+     *
+     * @param  {Array}  entityArray     An array of CSS entities. (Only CSSSelector instances are modified).
+     * @param  {number} [indentSpaces]  The number of spaces in an indent. Default is 4.
+     */
+    this.indent = function (entityArray, indentSpaces) {
+
+        var indentMap = {};
+
+        for (var i= 0, entity; entity = entityArray[i]; i++) {
+
+            if (!(entity instanceof CSSSelectors)) {
+                continue;
+            }
+
+            var selector = entity.selectors[0],
+                selectorNames = parseSelectorNames(selector.name),
+                indent = undefined,
+                parentSelNames = selectorNames.slice(0);
+
+            while (typeof indent === 'undefined' && parentSelNames.length) {
+                parentSelNames.pop();
+                indent = indentMap[parentSelNames.join()];
+            }
+
+            indent = (indent || 0) + 1;
+            var key = selectorNames.join();
+
+            indentMap[key] = indent;
+            entity.indent = (indent - 1) * (indentSpaces || 4);
         }
     };
+
+    /**
+     * Parse a selector string for individual selector components excluding combinators.
+     *
+     * @param  {string}  selector  The selector string.
+     *
+     * @returns {Array}  Array of string.
+     */
+    function parseSelectorNames(selector) {
+
+        var result = [],
+            currentName = '';
+
+        function pushName() {
+            if (currentName === ':')
+                return;
+
+            currentName && result.push(currentName);
+            currentName = '';
+        }
+
+        for (var i = 0; i < selector.length; i++) {
+            var ch = selector[i];
+
+            switch (ch) {
+                case '.':
+                case '[':
+                case ':':
+                    pushName();
+                    break;
+                case ' ':
+                case '>':
+                case '~':
+                case '+':
+                    if (selector[i - 1] === '\\') {
+                        currentName = currentName.substr(currentName.length - 1);
+                        break;
+                    }
+                    pushName();
+                    continue;
+            }
+
+            currentName += ch;
+        }
+
+        pushName();
+        return result;
+    }
+
 }]);
 }());

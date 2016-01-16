@@ -31,22 +31,26 @@
             <div class="panel-content" data-show-mode="retina">
                 <div class="half-box">
                     <p>
-                        This formatter gives some basic formatting options and provides a few extra formatting customizations and options. It does not attempt to modify or optimize your styles.
+                        This formatter gives some basic formatting options and provides a few extra formatting
+                        customizations and options. It does not attempt to modify or optimize your styles.
                     </p>
                     <p>
-                        By default, the formatter adds a table of contents to the formatted output and adds extra indent to reflect the table.
+                        By default, the formatter adds a table of contents to the formatted output and adds extra
+                        indent to reflect the table.
                     </p>
                 </div>
                 <div class="half-box">
                     <p>
-                        The table of contents is generated using selector level comments and the depth is determined by the number of astericks at the beginning of the comment.
+                        The table of contents is generated using selector level comments and the depth is determined
+                        by the number of astericks at the beginning of the comment.
                     </p>
                     <p>
                         Single asterick comments are ignored.
                     </p>
                 </div>
                 <div class="full-box">
-                    Add your CSS stylesheet to the input below to begin. If you need more info, each panel has its own help button in the upper right corner.
+                    Add your CSS stylesheet to the input below to begin. If you need more info, each panel has its
+                    own help button in the upper right corner.
                 </div>
             </div>
         </div>
@@ -54,14 +58,14 @@
         <!-- Input Panel -->
         <div class="panel panel-input">
             <h2>Input</h2>
-            <a href="#" class="help-btn" popup-button="inputHelp">?</a>
+            <a href="#" class="help-btn" data-popup-button="inputHelp">?</a>
 
             <!-- Text Area -->
             <div class="textarea">
                 <div class="parse-error-box" data-ng-class="{active:s.msg.parseError}">
                     {{s.msg.parseError}}
                 </div>
-                <textarea data-ng-model="input"></textarea>
+                <textarea data-ng-model="s.input"></textarea>
             </div>
 
             <!-- Input Help -->
@@ -80,10 +84,10 @@
         <!-- Output Panel -->
         <div class="panel panel-output">
             <h2>Output</h2>
-            <a href="#" class="help-btn" popup-button="outputHelp">?</a>
+            <a href="#" class="help-btn" data-popup-button="outputHelp">?</a>
 
             <!-- Format Select -->
-            <div class="select-box select-format" data-ng-model="format" data-show-mode="retina">
+            <div class="select-box select-format" data-ng-model="s.format" data-show-mode="retina">
 
                 <div class="display">
                     <span class="title">Format</span>
@@ -92,6 +96,7 @@
                 <ul data-transition-height="select.isOpen">
                     <li data-value="expanded">Expanded</li>
                     <li data-value="compacted">Compacted</li>
+                    <li data-value="nested">Nested</li>
                     <li data-value="compressed">Compressed</li>
                 </ul>
             </div>
@@ -104,7 +109,11 @@
 
                 <div>
                     <!-- indent slider -->
-                    <div class="slider-box" data-ng-model="css.indent" data-enable="format !== 'compressed'" data-min="0" data-max="8" data-step="1">
+                    <div class="slider-box" data-ng-model="css.indent"
+                         data-enable="s.format !== 'compressed'"
+                         data-min="0"
+                         data-max="8"
+                         data-step="1">
 
                         <div class="slider-box-edit-button">
                             <span class="value">
@@ -122,26 +131,38 @@
 
                 <div>
                     <!-- Include Comments Checkbox -->
-                    <div class="checkbox" data-enable="format !== 'compressed'">
-                        <input type="checkbox" id="include-comments" data-ng-model="css.comments.render" data-and="format !== 'compressed'">
+                    <div class="checkbox" data-enable="s.format !== 'compressed'">
+                        <input type="checkbox" id="include-comments"
+                               data-ng-model="css.comments.render"
+                               data-and="s.format !== 'compressed'">
+
                         <label for="include-comments">Include Comments</label>
                     </div>
 
                     <!-- Table of Contents Checkbox -->
                     <div class="checkbox" data-enable="css.comments.render">
-                        <input type="checkbox" id="table-of-contents" data-ng-model="css.tableOfContents" data-and="css.comments.render">
+                        <input type="checkbox" id="table-of-contents"
+                               data-ng-model="css.tableOfContents"
+                               data-and="css.comments.render">
+
                         <label for="table-of-contents">Table of Contents</label>
                     </div>
 
                     <!-- Include ToC Line Number Checkbox -->
                     <div class="checkbox" data-enable="css.tableOfContents && css.comments.render">
-                        <input type="checkbox" id="toc-line-number" data-ng-model="css.showLineNumbers" data-and="css.tableOfContents && css.comments.render">
+                        <input type="checkbox" id="toc-line-number"
+                               data-ng-model="css.showLineNumbers"
+                               data-and="css.tableOfContents && css.comments.render">
+
                         <label for="toc-line-number">ToC Line Numbers</label>
                     </div>
 
                     <!-- Add ToC Indent Checkbox -->
-                    <div class="checkbox" data-enable="css.tableOfContents && css.comments.render && format !== 'compressed'">
-                        <input type="checkbox" id="toc-indent" data-ng-model="css.tocIndent" data-and="css.tableOfContents && css.comments.render">
+                    <div class="checkbox" data-enable="css.tableOfContents && css.comments.render && s.format !== 'compressed'">
+                        <input type="checkbox" id="toc-indent"
+                               data-ng-model="css.tocIndent"
+                               data-and="css.tableOfContents && css.comments.render">
+
                         <label for="toc-indent">Add ToC Indent</label>
                     </div>
                 </div>
@@ -151,13 +172,18 @@
                 <div>
 
                     <!-- Selector on New Line Checkbox -->
-                    <div class="checkbox" data-enable="format !== 'compressed'">
+                    <div class="checkbox" data-enable="s.format !== 'compressed'">
                         <input type="checkbox" id="selectors-new-line" data-ng-model="css.selectors.newLine">
                         <label for="selectors-new-line">New Line</label>
                     </div>
 
                     <!-- Lines Before Slider -->
-                    <div class="slider-box" data-ng-model="css.selectors.linesBefore" data-enable="format !== 'compressed'" data-max="8" data-min="0" data-step="1">
+                    <div class="slider-box" data-ng-model="css.selectors.linesBefore"
+                         data-enable="s.format !== 'compressed'"
+                         data-max="8"
+                         data-min="0"
+                         data-step="1">
+
                         <div class="slider-box-edit-button">
                             <span class="value">
                               <span>{{css.selectors.linesBefore | number:0}}</span>
@@ -169,7 +195,12 @@
                     </div>
 
                     <!-- Lines Before Comment Slider -->
-                    <div class="slider-box" data-ng-model="css.selectors.linesBeforeComment" data-enable="format !== 'compressed'" data-max="8" data-min="0" data-step="1">
+                    <div class="slider-box" data-ng-model="css.selectors.linesBeforeComment"
+                         data-enable="s.format !== 'compressed'"
+                         data-max="8"
+                         data-min="0"
+                         data-step="1">
+
                         <div class="slider-box-edit-button">
                             <span class="value">
                               <span>{{css.selectors.linesBeforeComment | number:0}}</span>
@@ -184,27 +215,33 @@
                 <div>
 
                     <!-- Force Per Line Checkbox -->
-                    <div class="checkbox" data-enable="format !== 'compressed'">
-                        <input type="checkbox" id="selectors-force-line" data-ng-model="css.selectors.forcePerLine">
+                    <div class="checkbox" data-enable="s.format !== 'compressed'">
+                        <input type="checkbox" id="selectors-force-line"
+                               data-ng-model="css.selectors.forcePerLine">
+
                         <label for="selectors-force-line">1 Line per Selector</label>
                     </div>
 
                     <!-- Force Per Line Checkbox -->
-                    <div class="checkbox" data-enable="format !== 'compressed' && !css.selectors.forcePerLine">
-                        <input type="checkbox" id="selectors-force-combinated-line" data-ng-model="css.selectors.combinatedPerLine">
+                    <div class="checkbox" data-enable="s.format !== 'compressed' && !css.selectors.forcePerLine">
+                        <input type="checkbox" id="selectors-force-combinated-line"
+                               data-ng-model="css.selectors.combinatedPerLine">
+
                         <label for="selectors-force-combinated-line">1 Line per Combinated</label>
                     </div>
 
                     <!-- Max Length Textbox -->
-                    <div class="textbox" data-enable="format !== 'compressed' && !css.selectors.forcePerLine">
-                        <input type="text" id="selectors-max-length" data-ng-model="css.selectors.maxLength">
+                    <div class="textbox" data-enable="s.format !== 'compressed' && !css.selectors.forcePerLine">
+                        <input type="text" id="selectors-max-length"
+                               data-ng-model="css.selectors.maxLength">
+
                         <label for="selectors-max-length">
                             <span class="value">
-                              <span>{{css.selectors.maxLength | number:0}}</span><span class="unit-of-measure">ch</span>
+                               <span>{{css.selectors.maxLength | number:0}}</span><span class="unit-of-measure">ch</span>
                             </span>
                             <span class="title">
-                            Max Length
-                        </span>
+                                Max Length
+                            </span>
                         </label>
                     </div>
                 </div>
@@ -214,13 +251,19 @@
                 <div>
 
                     <!-- Open Brace on New Line Checkbox -->
-                    <div class="checkbox" data-enable="format !== 'compressed'">
-                        <input type="checkbox" id="braces-open-new-line" data-ng-model="css.braces.openNewLine">
+                    <div class="checkbox" data-enable="s.format !== 'compressed'">
+                        <input type="checkbox" id="braces-open-new-line"
+                               data-ng-model="css.braces.openNewLine">
+
                         <label for="braces-open-new-line">Open Brace New Line</label>
                     </div>
 
                     <!-- Open Brace Indent Slider -->
-                    <div class="slider-box" data-ng-model="css.braces.openIndent" data-enable="format !== 'compressed'" data-min="0" data-max="8" data-step="1">
+                    <div class="slider-box" data-ng-model="css.braces.openIndent"
+                         data-enable="s.format !== 'compressed'"
+                         data-min="0"
+                         data-max="8"
+                         data-step="1">
 
                         <div class="slider-box-edit-button">
                             <span class="value">
@@ -237,13 +280,20 @@
                 <div>
 
                     <!-- Close Brace on New Line Checkbox -->
-                    <div class="checkbox" data-enable="format !== 'compressed'">
-                        <input type="checkbox" id="braces-close-new-line" data-ng-model="css.braces.closeNewLine">
+                    <div class="checkbox" data-enable="s.format !== 'compressed'">
+                        <input type="checkbox" id="braces-close-new-line"
+                               data-ng-model="css.braces.closeNewLine">
+
                         <label for="braces-close-new-line">Close Brace New Line</label>
                     </div>
 
                     <!-- Close Brace Indent Slider -->
-                    <div class="slider-box" data-ng-model="css.braces.closeIndent" data-enable="format !== 'compressed'" data-max="8" data-min="0" data-step="1">
+                    <div class="slider-box" data-ng-model="css.braces.closeIndent"
+                         data-enable="s.format !== 'compressed'"
+                         data-max="8"
+                         data-min="0"
+                         data-step="1">
+
                         <div class="slider-box-edit-button">
                             <span class="value">
                               <span>{{css.braces.closeIndent | number:0}}</span><span class="unit-of-measure">sp</span>
@@ -260,16 +310,21 @@
             <!-- Output Stylesheet -->
             <div class="stylesheet-container">
 
-                <!-- Stylehseet Header -->
+                <!-- Stylesheet Header -->
                 <div class="stylesheet-header">
-                    <a href="#" class="icon copy" title="Copy Stylesheet to Clipboard" data-copy-btn="stylesheet" data-on-success="confirmCopy(true)" data-on-fail="confirmCopy(false)"></a>
+                    <a href="#" class="icon copy" title="Copy Stylesheet to Clipboard"
+                       data-copy-btn="stylesheet"
+                       data-on-success="confirmCopy(true)"
+                       data-on-fail="confirmCopy(false)"></a>
 
-                    <span class="copy-confirm copy-success hidden" data-ng-class="{'hidden':!s.msg.copy || !s.msg.copy.isSuccess, 'priority': !s.msg.copy || s.msg.copy.isSuccess}">Stylesheet copied to your clipboard.</span>
-                    <span class="copy-confirm copy-error hidden" data-ng-class="{'hidden':!s.msg.copy || s.msg.copy.isSuccess, 'priority': !s.msg.copy || !s.msg.copy.isSuccess}">Unable to copy stylesheet to your clipboard. Try manual copy.</span>
+                    <span class="copy-confirm copy-success hidden"
+                          data-ng-class="{'hidden':!s.msg.copy || !s.msg.copy.isSuccess, 'priority': !s.msg.copy || s.msg.copy.isSuccess}">Stylesheet copied to your clipboard.</span>
+                    <span class="copy-confirm copy-error hidden"
+                          data-ng-class="{'hidden':!s.msg.copy || s.msg.copy.isSuccess, 'priority': !s.msg.copy || !s.msg.copy.isSuccess}">Unable to copy stylesheet to your clipboard. Try manual copy.</span>
                 </div>
 
                 <!-- Stylesheet -->
-                <div class="stylesheet" id="stylesheet" data-css-lines="output"></div>
+                <div class="stylesheet" id="stylesheet" data-css-lines="s.output"></div>
             </div>
 
 
@@ -284,15 +339,16 @@
                         <li>
                             <span class="term">Format</span>
                             <span class="def">
-                        There are three basic formats to choose from: Expanded, Compacted and Compressed. You can edit settings for all except the 
-                        Compressed format. Some settings are reset when changing the format.
-                    </span>
+                                There are three basic formats to choose from: Expanded, Compacted and Compressed. You
+                                can edit settings for all except the Compressed format. Some settings are reset when
+                                changing the format.
+                            </span>
                         </li>
                         <li>
                             <span class="term">Indent</span>
                             <span class="def">
-                        The number of spaces per indent unit. The default is 4 spaces.
-                    </span>
+                                The number of spaces per indent unit. The default is 4 spaces.
+                            </span>
                         </li>
                     </ul>
                 </div>
@@ -303,20 +359,27 @@
                         <li>
                             <div class="term">Include Comments</div>
                             <div class="def">
-                                When enabled, the output will include comments. This must be enabled in order to use Table of Contents.
+                                When enabled, the output will include comments. This must be enabled in order to use
+                                Table of Contents.
                             </div>
                         </li>
                         <li>
                             <div class="term">Table of Contents</div>
                             <div class="def">
                                 <p>
-                                    When enabled, a table of contents comment is generated and included at the beginning of the output.
+                                    When enabled, a table of contents comment is generated and included at the
+                                    beginning of the output.
                                 </p>
                                 <p>
-                                    The table entries are take from selector level comments that start with more than 1 astericks. The depth of the entry is determined by the number of astericks. The more astericks, the less depth. The comments with the most astericks become the root depth and the comments with the least astericks become the deapest depth.
+                                    The table entries are take from selector level comments that start with more than
+                                    1 astericks. The depth of the entry is determined by the number of astericks.
+                                    The more astericks, the less depth. The comments with the most astericks become
+                                    the root depth and the comments with the least astericks become the deapest depth.
                                 </p>
                                 <p>
-                            The specific number of astericks used is unimportant as the entry depth is determined by the relative difference of the number of astericks in the available comments.
+                                    The specific number of astericks used is unimportant as the entry depth is
+                                    determined by the relative difference of the number of astericks in the available
+                                    comments.
                                 </p>
                         
                             </div>
@@ -330,7 +393,8 @@
                         <li>
                             <div class="term">Add ToC Indent</div>
                             <div class="def">
-                                When enabled, additional indent is added to the styles to represent the depth of their entry in the Table of Contents.
+                                When enabled, additional indent is added to the styles to represent the depth of their
+                                entry in the Table of Contents.
                             </div>
                         </li>
                     </ul>
@@ -354,7 +418,9 @@
                         <li>
                             <div class="term">Lines Before Comment</div>
                             <div class="def">
-                                The number of extra lines to add before selectors that are after a comment. The actual value is determined by whichever value is bigger: Lines Before and Close Before Comment.
+                                The number of extra lines to add before selectors that are after a comment. The actual
+                                value is determined by whichever value is bigger: Lines Before and Close Before
+                                Comment.
                             </div>
                         </li>
                         <li>
@@ -366,13 +432,17 @@
                         <li>
                             <div class="term">1 Line per Combinated</div>
                             <div class="def">
-                                When enabled, each selector in multi-selector that has at least 1 combinator (+, >, space, etc) is on it's own line. This option is disabled if all selectors in a multi-selectors are on their own line.
+                                When enabled, each selector in multi-selector that has at least 1 combinator
+                                (+, >, space, etc) is on it's own line. This option is disabled if all selectors in
+                                a multi-selectors are on their own line.
                             </div>
                         </li>
                         <li>
                             <div class="term">Max Length</div>
                             <div class="def">
-                                In a multi-selector, this is the max number of characters in a line before forcing the next line. Single selectors that exceed this value are never wrapped. This option is disabled if all selectors in multi-selectors are on their own line.
+                                In a multi-selector, this is the max number of characters in a line before forcing the
+                                next line. Single selectors that exceed this value are never wrapped. This option is
+                                disabled if all selectors in multi-selectors are on their own line.
                             </div>
                         </li>                        
 
@@ -391,7 +461,8 @@
                         <li>
                             <div class="term">Open Brace Indent</div>
                             <div class="def">
-                                The number of spaces to include before an opening brace. If the brace is on a new line, this is in addition to the normal indent.
+                                The number of spaces to include before an opening brace. If the brace is on a new
+                                line, this is in addition to the normal indent.
                             </div>
                         </li>
                         <li>
@@ -403,7 +474,8 @@
                         <li>
                             <div class="term">Open Brace Indent</div>
                             <div class="def">
-                                The number of spaces to include before a closing brace. If the brace is on a new line, this is in addition to the normal indent.
+                                The number of spaces to include before a closing brace. If the brace is on a new
+                                line, this is in addition to the normal indent.
                             </div>
                         </li>
 
@@ -413,7 +485,9 @@
                 <h3>Copy to Clipboard</h3>
                 <div class="help-content">
                     <p>
-                        You can copy the stylesheet to your clipboard easily by pressing the button located just above the generated stylesheet. If your browser does not support copy operations, you can still manually copy the text by right-clicking the selected text and choose 'Copy'.
+                        You can copy the stylesheet to your clipboard easily by pressing the button located just
+                        above the generated stylesheet. If your browser does not support copy operations, you can
+                        still manually copy the text by right-clicking the selected text and choose 'Copy'.
                     </p>
                 </div>
             </div>

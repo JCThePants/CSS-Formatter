@@ -21,3 +21,7 @@
 .disabled {
     opacity: 0.5 !important;
 }
+
+.disabled, .disabled *, [disabled], [disabled] * {
+  cursor: default !important;
+}
